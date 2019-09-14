@@ -104,3 +104,4 @@ venv.bak/
 .mypy_cache/
 
 SmartTrash-client/APIKey.py
+SmartTrash-server/APIKey.py

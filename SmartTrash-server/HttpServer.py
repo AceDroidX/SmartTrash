@@ -8,6 +8,8 @@ import threading
 import sys
 import urllib.request
 import urllib.parse
+from PIL import Image
+import io
 
 # 服务器监视端口号
 PORT = 23333
@@ -18,50 +20,16 @@ class Server(http.server.SimpleHTTPRequestHandler):
     def send(self, string):
         self.wfile.write(string.encode('utf-8'))
         print('send:'+string)
-
     def do_GET(self):
         # 发送空的响应头
         self.send_response(200)
         self.end_headers()
         # 从地址中分割出若干参数
-        params = self.path.split('/')
+        parseResult=urllib.parse.urlparse(self.path)
+        params=parseResult.path.split('/')
+        querys=urllib.parse.parse_qs(parseResult.query)
         # 捕获所有错误，防止程序崩溃
         try:
-            # 因为有根目录，分割后params[0]必定是空字符串
-            # # camera指令：
-            # #   如果前边初始化摄像头成功，则直接返回一帧图像
-            # #   否则反馈错误信息
-            # if params[1] == 'camera':
-            #   if cam != None:
-            #     __, img = cam.read()
-            #     cv2.imwrite('/tmp/camera.jpg', img)
-            #     with open('/tmp/camera.jpg', 'rb') as f:
-            #       self.wfile.write(f.read())
-            #   else:
-            #     self.wfile.write("没有检测到摄像头，请插入usb摄像头后重启系统")
-            # # virtkey指令：
-            # #   如果参数为单字符，则模拟这个按键
-            # #   否则反馈错误信息
-            # elif params[1] == 'virtkey':
-            #   if len(params[2]) == 1:
-            #     ord_key = ord(params[2])
-            #     v.press_keysym(ord_key)
-            #     v.release_keysym(ord_key)
-            #   else:
-            #     self.wfile.write("参数有误，virtkey指令仅支持单字符参数")
-            # # cmd指令：
-            # #   如果参数的python函数是合法的，则尝试执行这条指令
-            # #   如果途中出错，反馈错误信息
-            # elif params[1] == 'cmd':
-            #   for func in PCDUINO_FUNC:
-            #     if params[2].startswith(func):
-            #       try:
-            #         exec(params[2])
-            #       except:
-            #         self.wfile.write(params[2] + '函数的参数有误')
-            #       break
-            #   else:
-            #     self.wfile.write(params[2] + '不是一个已知的函数')
             if params[1] == 'ping':
                 self.send('SmartTrash')
             elif params[1] == 'name':
@@ -70,6 +38,9 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.35 Safari/537.36')
                 r = urllib.request.urlopen(req)
                 self.send(r.read().decode('utf-8'))
+            elif params[1]=='object_detection':
+                querys['input'][0]
+                pass
             # 其他指令：无效
             else:
                 self.wfile.write('无效指令'.encode('utf-8'))
@@ -79,6 +50,20 @@ class Server(http.server.SimpleHTTPRequestHandler):
             self.wfile.write('指令或参数存在未知错误'.encode('utf-8'))
             # self.wfile.write(sys.exc_info()[0])
             raise
+    def do_POST(self):
+        try:
+            print('getpost')
+            self.send_response(200)
+            self.end_headers()
+            length = int(self.headers['Content-Length'])
+            image = Image.open(io.BytesIO(self.rfile.read(length)))
+            image.save('/mnt/f/image.jpg')
+            self.wfile.write('{{"class_name":"test"}}'.encode('utf-8'))
+            print('saved')
+        except:
+            self.wfile.write('指令或参数存在未知错误'.encode('utf-8'))
+            raise
+        
 
 
 # Handler = Server
