@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
-import sys
-import threading
-import os
+import sys,threading,os
 import HttpServer
 
 isdebug = True

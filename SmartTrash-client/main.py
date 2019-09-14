@@ -3,7 +3,7 @@
 import sys
 import threading
 import os
-import HttpServer
+import image
 
 isdebug = True
 
@@ -25,8 +25,6 @@ if __name__ == '__main__':
     # setup
     if isdebug:
         print("命令行参数:%s" % sys.argv)
-    #TCPSocket.startServer()
-    HttpServer.start()
     about()
     print("SmartTrash已启动\n控制台帮助请输入help")
     # ----------------------------
@@ -44,6 +42,12 @@ if __name__ == '__main__':
             stop()
         elif cmd == "about" or cmd == "version":
             about()
+        elif cmd == "take":
+            image.take()
+        elif cmd == "imgc":
+            image.image_classify(image.image)
+        elif cmd == "get":
+            image.get()
         elif cmd == '':
             pass
         else:
