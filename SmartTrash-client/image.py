@@ -1,4 +1,3 @@
-import picamera
 from time import sleep
 import urllib.request,urllib.parse
 import sys
@@ -8,6 +7,10 @@ import base64
 import io
 from PIL import Image
 import APIKey
+try:
+    import picamera
+except:
+    print('cant import picamera')
 
 access_token = ''
 image=None
@@ -44,8 +47,9 @@ def image_classify(img):
     data = urllib.parse.urlencode(data).encode()
     request = urllib.request.Request(host, headers=headers, data=data)
     content = urllib.request.urlopen(request).read().decode("utf-8")
-    tokenjson = json.loads(content)
+    result = json.loads(content)
     print(content)  # debug
+    return result
 
 
 def take():

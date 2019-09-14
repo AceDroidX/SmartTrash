@@ -10,20 +10,26 @@ import urllib.request
 import urllib.parse
 from PIL import Image
 import io
+import uuid
+import json
+
+sys.path.append('../SmartTrash-client')
+from image import token,image_to_base64,image_classify
+
+threadLock = threading.Lock()
 
 # 服务器监视端口号
 PORT = 23333
 apiURL = "https://laji.lr3800.com/api.php?name="
-
+imgdic={}
+imglist=[]
 
 class Server(http.server.SimpleHTTPRequestHandler):
+    sendstr=""
     def send(self, string):
-        self.wfile.write(string.encode('utf-8'))
-        print('send:'+string)
+        self.sendstr=string
+
     def do_GET(self):
-        # 发送空的响应头
-        self.send_response(200)
-        self.end_headers()
         # 从地址中分割出若干参数
         parseResult=urllib.parse.urlparse(self.path)
         params=parseResult.path.split('/')
@@ -39,27 +45,57 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 r = urllib.request.urlopen(req)
                 self.send(r.read().decode('utf-8'))
             elif params[1]=='object_detection':
-                querys['input'][0]
+                img=imgdic[querys['input'][0]]
+                origin=image_classify(img)
+                result={}
+                result['img']=querys['input'][0]
+                result['data']=json.loads(json.dumps(origin).replace('"keyword":','"class_name":'))['result']
+                self.send(json.dumps(result))
                 pass
             # 其他指令：无效
             else:
                 self.wfile.write('无效指令'.encode('utf-8'))
+            self.protocol_version='HTTP/1.1'
+            self.send_response(200)
+            self.send_header('Content-Length',len(self.sendstr.encode('utf-8')))
+            self.send_header('Content-Type','text/html; charset=utf-8')
+            self.send_header("Connection","keep-alive")
+            self.end_headers()
+            self.wfile.write(self.sendstr.encode('utf-8'))
         except IndexError:
+            self.protocol_version='HTTP/1.1'
+            self.send_response(200)
             self.wfile.write('http地址参数错误:IndexError'.encode('utf-8'))
         except:
+            self.protocol_version='HTTP/1.1'
+            self.send_response(200)
             self.wfile.write('指令或参数存在未知错误'.encode('utf-8'))
             # self.wfile.write(sys.exc_info()[0])
             raise
     def do_POST(self):
         try:
+            global imgdic
+            global imglist
             print('getpost')
-            self.send_response(200)
-            self.end_headers()
             length = int(self.headers['Content-Length'])
-            image = Image.open(io.BytesIO(self.rfile.read(length)))
-            image.save('/mnt/f/image.jpg')
-            self.wfile.write('{{"class_name":"test"}}'.encode('utf-8'))
-            print('saved')
+            img = Image.open(io.BytesIO(self.rfile.read(length)))
+            #img.save('/mnt/f/image.jpg')
+            threadLock.acquire()
+            imgid=str(uuid.uuid4())
+            if len(imglist)>=10:
+                imgdic.pop(imglist.pop(0))
+            imglist.append(imgid)
+            imgdic[imgid]=img
+            print(imgid)
+            threadLock.release()
+            self.protocol_version='HTTP/1.1'
+            self.send_response(200)
+            self.send_header('Content-Length',len(imgid.encode('utf-8')))
+            self.send_header('Content-Type','text/html; charset=utf-8')
+            self.send_header("Connection","keep-alive")
+            self.end_headers()
+            self.wfile.write(imgid.encode('utf-8'))
+            #print('saved')
         except:
             self.wfile.write('指令或参数存在未知错误'.encode('utf-8'))
             raise
