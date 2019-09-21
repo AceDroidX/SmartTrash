@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 import sys,threading,os
 import HttpServer
+import api
 
 isdebug = True
 
@@ -43,7 +44,7 @@ if __name__ == '__main__':
         elif cmd[0] == "about" or cmd[0] == "version":
             about()
         elif cmd[0] == 'change':
-            HttpServer.apinum=int(cmd[1])
+            api.num=int(cmd[1])
         elif cmd[0] == '':
             pass
         else:
