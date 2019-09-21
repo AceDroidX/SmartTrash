@@ -20,7 +20,15 @@ threadLock = threading.Lock()
 
 # 服务器监视端口号
 PORT = 23333
-apiURL = "https://laji.lr3800.com/api.php?name="
+api_get = [
+    "https://laji.lr3800.com/api.php?name=",
+    'http://api.choviwu.top/garbage/getGarbage?garbageName=',
+    'https://www.lajiflw.cn/rubbish/search?q='
+]
+api_post = [
+    
+]
+apinum = 3
 imgdic={}
 imglist=[]
 
@@ -39,8 +47,12 @@ class Server(http.server.SimpleHTTPRequestHandler):
             if params[1] == 'ping':
                 self.send('SmartTrash')
             elif params[1] == 'name':
-                print('fullurl:'+apiURL+params[2])
-                req = urllib.request.Request(apiURL+params[2])
+                if apinum<len(api_get):
+                    url=api_get[apinum]+params[2]
+                else:
+                    print('err:apinum')
+                print('fullurl:'+url)
+                req = urllib.request.Request(url)
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.35 Safari/537.36')
                 r = urllib.request.urlopen(req)
                 self.send(r.read().decode('utf-8'))

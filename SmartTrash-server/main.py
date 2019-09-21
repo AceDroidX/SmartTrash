@@ -31,18 +31,20 @@ if __name__ == '__main__':
 
     # loop
     while True:
-        cmd = input("wxx>")
-        if cmd == "help":
+        cmd=input("wxx>").split(' ')
+        if cmd[0] == "help":
             print("SmartTrash控制台帮助")
             print("about或version-----显示版本信息")
             print("help-----显示此帮助")
             print("stop或exit-----退出程序")
             print("")
-        elif cmd == "stop" or cmd == "exit":
+        elif cmd[0] == "stop" or cmd[0] == "exit":
             stop()
-        elif cmd == "about" or cmd == "version":
+        elif cmd[0] == "about" or cmd[0] == "version":
             about()
-        elif cmd == '':
+        elif cmd[0] == 'change':
+            HttpServer.apinum=int(cmd[1])
+        elif cmd[0] == '':
             pass
         else:
             print("未知命令 输入help查看帮助")
