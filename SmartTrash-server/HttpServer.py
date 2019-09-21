@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-from image import token, image_to_base64, image_classify
 import http.server
 import socketserver
 from time import sleep
@@ -16,6 +15,7 @@ import json
 import api
 
 sys.path.append('../SmartTrash-client')
+from image import token, image_to_base64, image_classify
 
 threadLock = threading.Lock()
 
@@ -31,6 +31,17 @@ class Server(http.server.SimpleHTTPRequestHandler):
     def send(self, string):
         self.sendstr = string
 
+    def getType(self,name):
+        url = api.getURL(name)
+        print('fullurl:'+url)
+        req = urllib.request.Request(url)
+        req.add_header(
+            'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.35 Safari/537.36')
+        r = urllib.request.urlopen(req)
+        result = api.getResponse(name,r.read().decode('utf-8'))
+        print('result:'+result)
+        return result
+
     def do_GET(self):
         # 从地址中分割出若干参数
         parseResult = urllib.parse.urlparse(self.path)
@@ -41,14 +52,7 @@ class Server(http.server.SimpleHTTPRequestHandler):
             if params[1] == 'ping':
                 self.send('SmartTrash')
             elif params[1] == 'name':
-                url = api.getURL(params[2])
-                print('fullurl:'+url)
-                req = urllib.request.Request(url)
-                req.add_header(
-                    'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.35 Safari/537.36')
-                r = urllib.request.urlopen(req)
-                result = api.getResponse(r.read().decode('utf-8'))
-                print('result:'+result)
+                result = self.getType(params[2])
                 self.send(result)
             elif params[1] == 'object_detection':
                 img = imgdic[querys['input'][0]]
@@ -57,8 +61,11 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 result['img'] = querys['input'][0]
                 result['data'] = json.loads(json.dumps(origin).replace(
                     '"keyword":', '"class_name":'))['result']
+                if True:  # 将物体名直接转换成类型
+                    for index in range(len(result['data'])):
+                        result['data'][index]['class_name'] = self.getType(
+                            result['data'][index]['class_name'])
                 self.send(json.dumps(result))
-                pass
             # 其他指令：无效
             else:
                 self.wfile.write('无效指令'.encode('utf-8'))
