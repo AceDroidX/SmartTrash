@@ -48,6 +48,8 @@ if __name__ == '__main__':
             image.image_classify(image.image)
         elif cmd == "get":
             image.get()
+        elif cmd == 'type':
+            image.getType(image.result)
         elif cmd == '':
             pass
         else:

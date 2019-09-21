@@ -14,11 +14,13 @@ num = 3
 
 
 def getURL(name):
+    if name == '':
+        raise 'name cant be blank'
     if num < len(gets):
         return gets[num]+name
     else:
-        print('err:api.num:%ilen:%i'%(num,len(gets)))
-        return gets[0]+name
+        print('err:api.num:%ilen:%i' % (num, len(gets)))
+        return gets[3]+name
 
 
 def getResponse(content):
@@ -27,26 +29,26 @@ def getResponse(content):
         response = ''
         if num == 0:
             if jsoncon['msg'] != 'success':
-                return 'err:num %i not success'%(num)
+                return 'err:num %i not success' % (num)
             tmplist = {'0': '可回收', '1': '有害', '2': '厨余(湿)', '3': '其他(干)'}
             return tmplist[jsoncon['newslist'][0]['type']]
         elif num == 1:
             if jsoncon['msg'] != 'success':
-                return 'err:num %i not success'%(num)
+                return 'err:num %i not success' % (num)
             return jsoncon['data'][0]['gType']
         elif num == 2:
             if jsoncon['msg'] != '获取成功！':
-                return 'err:num %i not success'%(num)
+                return 'err:num %i not success' % (num)
             return jsoncon['data'][0]['itemCategory']
         elif num == 3:
             if jsoncon['msg'] != 'succ':
-                return 'err:num %i not success'%(num)
+                return 'err:num %i not success' % (num)
             return jsoncon['data']['value'][0]['style']['answer']
         else:
-            return 'num %i not exist'%(num)
+            return 'num %i not exist' % (num)
     except KeyError as e:
-        if num==3:
-            return 'err:num %i is not a trash'%(num)
+        if num == 3:
+            return 'err:num %i is not a trash' % (num)
         else:
             raise
     except Exception as e:
