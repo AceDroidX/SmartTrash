@@ -49,7 +49,7 @@ if __name__ == '__main__':
         elif cmd == "get":
             image.get()
         elif cmd == 'type':
-            image.getType(image.result)
+            image.getType(image.result['result'][0]['keyword']+'/'+image.result['result'][0]['root'])
         elif cmd == '':
             pass
         else:

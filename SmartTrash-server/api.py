@@ -42,31 +42,31 @@ def getResponse(name, content):
             f.write("\n-------------\n")
         if num == 0 or num == 5:
             if jsoncon['msg'] != 'success':
-                return '[%s]分类检索失败-num %i not success' % (name, num)
+                return {'type': 1, 'name': name, 'num': num}
             #tmplist = {'0': '可回收', '1': '有害', '2': '厨余(湿)', '3': '其他(干)'}
             tmplist = ['可回收', '有害', '厨余(湿)', '其他(干)']
             return tmplist[jsoncon['newslist'][0]['type']]
         elif num == 1:
             if jsoncon['msg'] != 'success':
-                return '[%s]分类检索失败-num %i not success' % (name, num)
+                return {'type': 1, 'name': name, 'num': num}
             return jsoncon['data'][0]['gType']
         elif num == 2:
             if jsoncon['msg'] != '获取成功！':
-                return '[%s]分类检索失败-num %i not success' % (name, num)
+                return {'type': 1, 'name': name, 'num': num}
             return jsoncon['data'][0]['itemCategory']
         elif num == 3:
             if jsoncon['msg'] != 'succ':
-                return '[%s]分类检索失败-num %i not success' % (name, num)
+                return {'type': 1, 'name': name, 'num': num}
             return jsoncon['data']['value'][0]['style']['answer']
         elif num == 4:
             return jsoncon['type']
         else:
-            return '[%s]分类检索失败-num %i not exist' % (name, num)
+            return {'type': 3, 'name': name, 'num': num}
     except KeyError as e:
         if num == 3:
-            return 'err:[%s]分类检索失败-num %i is not a trash' % (name, num)
+            return {'type': 2, 'name': name, 'num': num}
         elif num == 4:
-            return 'err:[%s]分类检索失败-num %i is not a trash' % (name, num)
+            return {'type': 2, 'name': name, 'num': num}
         else:
             raise
     except Exception as e:
@@ -75,3 +75,23 @@ def getResponse(name, content):
             exc_type, exc_value, exc_traceback_obj, file=sys.stdout)
         print(content)
         return str(e)
+
+
+def getType(name, content, root):#todo:需要添加物品类别判断
+    response = getResponse(name, content)
+    result = ''
+    if type(response) == dict:
+        if response['type'] == 1:
+            result = 'err:[%s]分类检索失败-num %i not success' % (
+                response['name'], response['num'])
+        elif response['type'] == 2:
+            result = 'err:[%s]分类检索失败-num %i is not a trash' % (
+                response['name'], response['num'])
+        elif response['type'] == 3:
+            result = 'err:[%s]分类检索失败-num %i not exist' % (
+                response['name'], response['num'])
+    elif type(response) == str:
+        result = response
+    else:
+        result = 'err:unknown var type'
+    return result

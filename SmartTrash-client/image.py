@@ -16,8 +16,7 @@ except:
 access_token = ''
 image = None
 camera = None
-result = ''
-
+result = json
 
 def token():
     global access_token

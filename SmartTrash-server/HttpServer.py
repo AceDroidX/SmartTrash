@@ -31,14 +31,14 @@ class Server(http.server.SimpleHTTPRequestHandler):
     def send(self, string):
         self.sendstr = string
 
-    def getType(self,name):
+    def getType(self,name,root):
         url = api.getURL(name)
         print('fullurl:'+url)
         req = urllib.request.Request(url)
         req.add_header(
             'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.35 Safari/537.36')
         r = urllib.request.urlopen(req)
-        result = api.getResponse(name,r.read().decode('utf-8'))
+        result = api.getType(name,r.read().decode('utf-8'),root)
         print('result:'+result)
         return result
 
@@ -52,7 +52,10 @@ class Server(http.server.SimpleHTTPRequestHandler):
             if params[1] == 'ping':
                 self.send('SmartTrash')
             elif params[1] == 'name':
-                result = self.getType(params[2])
+                root=""
+                if len(params)>=4:
+                    root=params[3]
+                result = self.getType(params[2],root)
                 self.send(result)
             elif params[1] == 'object_detection':
                 img = imgdic[querys['input'][0]]
@@ -62,9 +65,12 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 result['data'] = json.loads(json.dumps(origin).replace(
                     '"keyword":', '"class_name":'))['result']
                 if True:  # 将物体名直接转换成名字+类型
+                    root=""
+                    if len(params)>=4:
+                        root=params[3]
                     for index in range(len(result['data'])):
                         result['data'][index]['class_name'] = result['data'][index]['class_name']+" "+self.getType(
-                            result['data'][index]['class_name'])
+                            result['data'][index]['class_name'],root)
                 self.send(json.dumps(result))
             # 其他指令：无效
             else:
