@@ -61,9 +61,9 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 result['img'] = querys['input'][0]
                 result['data'] = json.loads(json.dumps(origin).replace(
                     '"keyword":', '"class_name":'))['result']
-                if True:  # 将物体名直接转换成类型
+                if True:  # 将物体名直接转换成名字+类型
                     for index in range(len(result['data'])):
-                        result['data'][index]['class_name'] = self.getType(
+                        result['data'][index]['class_name'] = result['data'][index]['class_name']+" "+self.getType(
                             result['data'][index]['class_name'])
                 self.send(json.dumps(result))
             # 其他指令：无效
