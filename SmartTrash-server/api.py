@@ -33,9 +33,6 @@ def getResponse(name, content,mode):
     try:
         jsoncon = json.loads(content)
         response = ''
-        with open('response-api.json', 'w',encoding='utf-8') as f:
-            f.write(content)
-            f.write("\n")
         if num == 0 or num == 5:
             if content.find('250')!=-1:
                 return '很抱歉，您当前搜索的[%s]暂无分类结果，请您通过“垃圾图鉴”查询'%(name)

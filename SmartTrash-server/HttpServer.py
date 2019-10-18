@@ -4,6 +4,7 @@
 import http.server
 import socketserver
 from time import sleep
+import time
 import threading
 import sys
 import urllib.request
@@ -30,7 +31,13 @@ class Server(http.server.SimpleHTTPRequestHandler):
     sendstr = ""
 
     def send(self, string):
+        global threadLock
         self.sendstr = string
+        threadLock.acquire()
+        with open('log.txt', 'a',encoding='utf-8') as f:
+            f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()
+                    )+"---"+self.address_string()+"--->[send]"+string+"\n")
+        threadLock.release()
 
     def getType(self,name,mode=0):
         name=urllib.parse.quote(name, safe=string.printable)
@@ -45,10 +52,16 @@ class Server(http.server.SimpleHTTPRequestHandler):
         return result
 
     def do_GET(self):
+        global threadLock
         # 从地址中分割出若干参数
         parseResult = urllib.parse.urlparse(self.path)
         params = parseResult.path.split('/')
         querys = urllib.parse.parse_qs(parseResult.query)
+        threadLock.acquire()
+        with open('log.txt', 'a',encoding='utf-8') as f:
+            f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()
+                    )+"---"+self.address_string()+"--->[get]"+self.path+"\n")
+        threadLock.release()
         # 捕获所有错误，防止程序崩溃
         try:
             if params[1] == 'ping':
@@ -62,9 +75,11 @@ class Server(http.server.SimpleHTTPRequestHandler):
             elif params[1] == 'object_detection':
                 img = imgdic[querys['input'][0]]
                 origin = image_classify(img)
+                threadLock.acquire()
                 with open('response-ic.json', 'w',encoding='utf-8') as f:
                     f.write(json.dumps(origin,ensure_ascii=False))
                     f.write("\n")
+                threadLock.release()
                 if str(origin).find('err')!=-1:
                     self.send('图像识别错误，请重新拍摄')
                     return
@@ -79,9 +94,11 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 #     for index in range(len(result['data'])):
                 #         result['data'][index]['class_name'] = result['data'][index]['class_name']+" "+self.getType(
                 #             result['data'][index]['class_name'])
+                threadLock.acquire()
                 with open('response.json', 'w',encoding='utf-8') as f:
                     f.write(json.dumps(result,ensure_ascii=False))
                     f.write("\n")
+                threadLock.release()
                 self.send(json.dumps(result,ensure_ascii=False))
                 # 新版本
                 # trashname = origin['result'][0]['keyword']
@@ -111,6 +128,7 @@ class Server(http.server.SimpleHTTPRequestHandler):
             raise
 
     def do_POST(self):
+        global threadLock
         try:
             global imgdic
             global imglist
@@ -124,6 +142,9 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 imgdic.pop(imglist.pop(0))
             imglist.append(imgid)
             imgdic[imgid] = img
+            with open('log.txt', 'a',encoding='utf-8') as f:
+                f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()
+                                      )+"---"+self.address_string()+"--->[imgid]"+imgid+"\n")
             print(imgid)
             threadLock.release()
             self.protocol_version = 'HTTP/1.1'
