@@ -1,7 +1,8 @@
 from time import sleep
-import urllib.request,urllib.parse
+import urllib.request
+import urllib.parse
 import sys
-import ssl  
+import ssl
 import json
 import base64
 import io
@@ -13,8 +14,10 @@ except:
     print('cant import picamera')
 
 access_token = ''
-image=None
-camera=None
+image = None
+camera = None
+result = ''
+
 
 def token():
     global access_token
@@ -33,7 +36,8 @@ def token():
 
 def image_classify(img):
     global access_token
-    if access_token=='':
+    global result
+    if access_token == '':
         token()
     host = "https://aip.baidubce.com/rest/2.0/image-classify/v2/advanced_general?access_token=%s" % (
         access_token)
@@ -56,7 +60,7 @@ def take():
     global image
     global camera
     stream = io.BytesIO()
-    if camera==None:
+    if camera == None:
         camera = picamera.PiCamera()
     camera.start_preview()
     # Camera warm-up time
@@ -68,13 +72,26 @@ def take():
     image.save('/tmp/image.jpg')  # debug
     return image
 
+
 def get():
     global image
     image = Image.open('/tmp/image.jpg')
     return image
+
 
 def image_to_base64(img):
     buffered = io.BytesIO()
     img.save(buffered, format="JPEG")
     img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
     return img_str
+
+
+def getType(name):
+    host = APIKey.type_host+name
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    request = urllib.request.Request(host, headers=headers)
+    content = urllib.request.urlopen(request).read().decode("utf-8")
+    print(content)  # debug
+    return content
