@@ -6,6 +6,7 @@ import ssl
 import json
 import base64
 import io
+import string
 from PIL import Image
 import APIKey
 try:
@@ -59,12 +60,16 @@ def take():
     global image
     global camera
     stream = io.BytesIO()
-    if camera == None:
-        camera = picamera.PiCamera()
-    camera.start_preview()
-    # Camera warm-up time
-    sleep(2)
-    camera.capture(stream, format='jpeg')
+    try:
+        if camera == None:
+            camera = picamera.PiCamera()
+        camera.start_preview()
+        # Camera warm-up time
+        sleep(2)
+        camera.capture(stream, format='jpeg')
+    finally:
+        camera.close()
+        camera=None
     # "Rewind" the stream to the beginning so we can read its content
     stream.seek(0)
     image = Image.open(stream)
@@ -86,7 +91,7 @@ def image_to_base64(img):
 
 
 def getType(name):
-    host = APIKey.type_host+name
+    host = urllib.parse.quote(APIKey.type_host+name, safe=string.printable)
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
