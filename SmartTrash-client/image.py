@@ -53,6 +53,7 @@ def image_classify(img):
     content = urllib.request.urlopen(request).read().decode("utf-8")
     result = json.loads(content)
     print(content)  # debug
+    print(result['result'][0]['keyword'])
     return result
 
 

@@ -21,6 +21,8 @@ def init():
     l.pack()
     b1 = tk.Button(window, text='hit me', font=('Arial', 12), width=10, height=1, command=hit_me)
     b1.pack()
+    b2 = tk.Button(window, text='hit me', font=('Arial', 12), width=10, height=1, command=hit_me)
+    b2.pack()
     window.mainloop()
 def ontake(path):
     if window==None:
@@ -30,7 +32,11 @@ def yes:
 def no:
     pass
 def start:
-    pass
+    global window
+    global l
+    global b1
+    global var
+    b1.text='拍摄并识别'
 if __name__ == '__main__':
     init()
     

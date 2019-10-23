@@ -4,6 +4,7 @@ import sys
 import threading
 import os
 import image
+import hardware
 
 isdebug = True
 
@@ -50,6 +51,11 @@ if __name__ == '__main__':
             image.get()
         elif cmd == 'type':
             image.getType(image.result['result'][0]['keyword']+'/'+image.result['result'][0]['root'])
+        elif cmd == 'run':
+            image.take()
+            image.image_classify(image.image)
+            trashtype=image.getType(image.result['result'][0]['keyword']+'/'+image.result['result'][0]['root'])
+            hardware.run(trashtype)
         elif cmd == '':
             pass
         else:
