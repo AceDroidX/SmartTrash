@@ -5,8 +5,10 @@ import threading
 import os
 import image
 import hardware
+import ui
 
 isdebug = True
+showui=True
 
 cmd = ''
 
@@ -21,6 +23,13 @@ def about():
     print("By AceDroidX")
     print("----------------------------")
 
+def run():
+    image.take()
+    name=image.image_classify(image.image)['result'][0]['keyword']
+    trashtype=image.getType(image.result['result'][0]['keyword']+'/'+image.result['result'][0]['root'])
+    hardware.run(trashtype)
+    return [name,trashtype]
+
 # -----------------------------
 if __name__ == '__main__':
     # setup
@@ -29,7 +38,8 @@ if __name__ == '__main__':
     about()
     print("SmartTrash已启动\n控制台帮助请输入help")
     # ----------------------------
-
+    if showui:
+        ui.startui()
     # loop
     while True:
         cmd = input("wxx>")
@@ -52,10 +62,7 @@ if __name__ == '__main__':
         elif cmd == 'type':
             image.getType(image.result['result'][0]['keyword']+'/'+image.result['result'][0]['root'])
         elif cmd == 'run':
-            image.take()
-            image.image_classify(image.image)
-            trashtype=image.getType(image.result['result'][0]['keyword']+'/'+image.result['result'][0]['root'])
-            hardware.run(trashtype)
+            run()
         elif cmd == '':
             pass
         else:
