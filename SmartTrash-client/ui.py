@@ -33,7 +33,7 @@ def run():
     global var
     global l
     result=main.run()
-    l.text=result[0]+'\n'+result[1]
+    l.config(text=result[0]+'\n'+result[1])
 def yes():
     pass
 def no():

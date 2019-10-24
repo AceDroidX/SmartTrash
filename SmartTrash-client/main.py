@@ -9,6 +9,7 @@ import ui
 
 isdebug = True
 showui=True
+resetonstart=True
 
 cmd = ''
 
@@ -40,6 +41,8 @@ if __name__ == '__main__':
     # ----------------------------
     if showui:
         ui.startui()
+    if resetonstart:
+        hardware.reset()
     # loop
     while True:
         cmd = input("wxx>")

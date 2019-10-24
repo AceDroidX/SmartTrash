@@ -1,10 +1,11 @@
 import pigpio
-import time
+import time,os
 #40-90 90-140
 IN1=18
 IN2=23
 changetime=1
 pi=None
+
 def angle2duty(degree):
     if degree>180 or degree<0:
         print('err:ang2dut:'+degree)
@@ -14,6 +15,9 @@ def angle2duty(degree):
 
 def init():
     global pi
+    cmd=os.popen('ps -Al|grep pigpiod').read()
+    if cmd.find('pigpiod')==-1:
+        os.popen('sudo pigpiod')
     pi = pigpio.pi()
     pi.set_PWM_frequency(IN1, 50)
     pi.set_PWM_range(IN1, 2000)
