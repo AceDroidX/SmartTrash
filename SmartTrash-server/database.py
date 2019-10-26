@@ -40,12 +40,25 @@ def getType(name):
     print('getType:'+str(result))
     return result
 
+def dbUpdate(name,trashtype):
+    dbresult=getType(name)
+    if dbresult==None:
+        return addType(name,trashtype)
+    else:
+        return updateType(name,trashtype)
+
 def addType(name,trashtype):
+    print('addType:name:%strashtype:%s'%(name,trashtype))
     mycursor = mydb.cursor()
     mycursor.execute('use smarttrash')
     mycursor.execute('INSERT INTO typelist (name, type, time) VALUES ("%s", %s, NOW());'%(name,trashtype))
+    mydb.commit()
+    return mycursor.rowcount
 
 def updateType(name,trashtype):
+    print('updateType:name:%strashtype:%s'%(name,trashtype))
     mycursor = mydb.cursor()
     mycursor.execute('use smarttrash')
     mycursor.execute('UPDATE typelist SET type=%s WHERE name="%s"'%(trashtype,name))
+    mydb.commit()
+    return mycursor.rowcount

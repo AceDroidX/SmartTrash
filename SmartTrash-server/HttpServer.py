@@ -40,14 +40,13 @@ class Server(http.server.SimpleHTTPRequestHandler):
         self.send_header("Connection", "keep-alive")
         self.end_headers()
         self.wfile.write(self.sendstr.encode('utf-8'))
-        return
 
     def do_GET(self):
         global threadLock
         # 从地址中分割出若干参数
         parseResult = urllib.parse.urlparse(self.path)
-        params = parseResult.path.split('/')
-        querys = urllib.parse.parse_qs(parseResult.query)
+        params = urllib.parse.unquote(parseResult.path).split('/')
+        querys = urllib.parse.parse_qs(urllib.parse.unquote(parseResult.query))
         threadLock.acquire()
         with open('log.txt', 'a',encoding='utf-8') as f:
             f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()
@@ -66,6 +65,13 @@ class Server(http.server.SimpleHTTPRequestHandler):
             elif params[1] == 'db-update':
                 if main.usedb==False:
                     self.send('err:服务器关闭了数据添加功能')
+                    return
+                try:
+                    result=database.dbUpdate(params[2],params[3])
+                    self.send('success:'+str(result))
+                except:
+                    self.send('err:服务器数据库更新失败')
+                    raise
             elif params[1] == 'object_detection':
                 img = imgdic[querys['input'][0]]
                 origin = image_classify(img)
@@ -76,6 +82,7 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 threadLock.release()
                 if str(origin).find('err')!=-1:
                     self.send('图像识别错误，请重新拍摄')
+                    return
                 # 老版本
                 result = {}
                 result['img'] = querys['input'][0]
