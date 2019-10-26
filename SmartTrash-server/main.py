@@ -5,6 +5,7 @@ import HttpServer
 import api
 
 isdebug = True
+usedb=True
 
 cmd = ''
 
@@ -30,6 +31,9 @@ if __name__ == '__main__':
     print("SmartTrash已启动\n控制台帮助请输入help")
     # ----------------------------
 
+    if usedb:
+        pass
+    
     # loop
     while True:
         cmd=input("wxx>").split(' ')

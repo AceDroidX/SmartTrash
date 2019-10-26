@@ -64,7 +64,7 @@ def take():
     try:
         if camera == None:
             camera = picamera.PiCamera()
-        camera.start_preview()
+        camera.start_preview(fullscreen=False,window=(213, 0, 854, 480))
         # Camera warm-up time
         sleep(2)
         camera.capture(stream, format='jpeg')

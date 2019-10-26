@@ -4,17 +4,12 @@
 import http.server
 import socketserver
 from time import sleep
-import time
 import threading
-import sys
 import urllib.request
 import urllib.parse
 from PIL import Image
-import io
-import uuid
-import json
-import api
-import string
+import sys,io,uuid,json,time,string
+import api,main
 
 sys.path.append('../SmartTrash-client')
 from image import token, image_to_base64, image_classify
@@ -25,7 +20,6 @@ threadLock = threading.Lock()
 PORT = 23333
 imgdic = {}
 imglist = []
-
 
 class Server(http.server.SimpleHTTPRequestHandler):
     sendstr = ""
@@ -38,18 +32,15 @@ class Server(http.server.SimpleHTTPRequestHandler):
             f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()
                     )+"---"+self.address_string()+"--->[send]"+string+"\n")
         threadLock.release()
-
-    def getType(self,name,mode=0):
-        name=urllib.parse.quote(name, safe=string.printable)
-        url = api.getURL(name)
-        print('fullurl:'+url)
-        req = urllib.request.Request(url)
-        req.add_header(
-            'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.35 Safari/537.36')
-        r = urllib.request.urlopen(req)
-        result = api.getResponse(urllib.parse.unquote(name),r.read().decode('utf-8'),mode)
-        print('result:'+result)
-        return result
+        self.protocol_version = 'HTTP/1.1'
+        self.send_response(200)
+        self.send_header('Content-Length',
+                             len(self.sendstr.encode('utf-8')))
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.send_header("Connection", "keep-alive")
+        self.end_headers()
+        self.wfile.write(self.sendstr.encode('utf-8'))
+        return
 
     def do_GET(self):
         global threadLock
@@ -67,11 +58,14 @@ class Server(http.server.SimpleHTTPRequestHandler):
             if params[1] == 'ping':
                 self.send('SmartTrash')
             elif params[1] == 'name':
-                result = self.getType(params[2])
+                result = api.getType(params[2])
                 self.send(result)
             elif params[1] == 'namem1':
-                result = self.getType(params[2],1)
+                result = api.getType(params[2],1)
                 self.send(result)
+            elif params[1] == 'db-update':
+                if main.usedb==False:
+                    self.send('err:服务器关闭了数据添加功能')
             elif params[1] == 'object_detection':
                 img = imgdic[querys['input'][0]]
                 origin = image_classify(img)
@@ -82,17 +76,16 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 threadLock.release()
                 if str(origin).find('err')!=-1:
                     self.send('图像识别错误，请重新拍摄')
-                    return
                 # 老版本
                 result = {}
                 result['img'] = querys['input'][0]
                 result['data'] = json.loads(json.dumps(origin,ensure_ascii=False).replace(
                     '"keyword":', '"class_name":'))['result']
                 if True:  #将第一个物体名替换成mode1结果
-                    result['data'][0]['class_name'] = self.getType(result['data'][0]['class_name'],1)
+                    result['data'][0]['class_name'] = api.getType(result['data'][0]['class_name'],1)
                 # if True:  # 将所有物体名直接转换成名字+类型
                 #     for index in range(len(result['data'])):
-                #         result['data'][index]['class_name'] = result['data'][index]['class_name']+" "+self.getType(
+                #         result['data'][index]['class_name'] = result['data'][index]['class_name']+" "+api.getType(
                 #             result['data'][index]['class_name'])
                 threadLock.acquire()
                 with open('response.json', 'w',encoding='utf-8') as f:
@@ -103,19 +96,11 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 # 新版本
                 # trashname = origin['result'][0]['keyword']
                 # trashroot = origin['result'][0]['root']
-                # trashtype = self.getType(trashname,1)
+                # trashtype = api.getType(trashname,1)
                 # self.send(trashtype)
             # 其他指令：无效
             else:
                 self.send('无效指令'.encode('utf-8'))
-            self.protocol_version = 'HTTP/1.1'
-            self.send_response(200)
-            self.send_header('Content-Length',
-                             len(self.sendstr.encode('utf-8')))
-            self.send_header('Content-Type', 'text/html; charset=utf-8')
-            self.send_header("Connection", "keep-alive")
-            self.end_headers()
-            self.wfile.write(self.sendstr.encode('utf-8'))
         except IndexError:
             self.protocol_version = 'HTTP/1.1'
             self.send_response(200)
