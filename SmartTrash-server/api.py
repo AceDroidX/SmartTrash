@@ -5,6 +5,7 @@ import urllib.parse
 import string
 import APIKey,database,main
 thkey = APIKey.th_key
+typelist = ['可回收', '有害', '厨余(湿)', '其他(干)']
 gets = [
     "https://laji.lr3800.com/api.php?name=",
     'http://api.choviwu.top/garbage/getGarbage?garbageName=',
@@ -18,7 +19,6 @@ posts = [
 ]
 num = 5
 
-
 def getURL(name):
     if name == '':
         raise 'name cant be blank'
@@ -29,18 +29,18 @@ def getURL(name):
         return urllib.parse.quote(gets[3]+name, safe=string.printable)
 
 def getType(name,mode=0):
+    name=urllib.parse.unquote(name)
     if main.usedb:
         dbresult=database.getType(name)
         if dbresult!=None:
-            return dbresult
-    name=urllib.parse.quote(name, safe=string.printable)
+            return typelist[dbresult[0]]
     url = getURL(name)
     print('fullurl:'+url)
     req = urllib.request.Request(url)
     req.add_header(
         'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.35 Safari/537.36')
     r = urllib.request.urlopen(req)
-    result = getResponse(urllib.parse.unquote(name),r.read().decode('utf-8'),mode)
+    result = getResponse(name,r.read().decode('utf-8'),mode)
     print('result:'+result)
     return result
 
@@ -53,12 +53,12 @@ def getResponse(name, content,mode):
                 return '很抱歉，您当前搜索的[%s]暂无分类结果，请您通过“垃圾图鉴”查询'%(name)
             if jsoncon['msg'] != 'success':
                 return '[%s]err:分类检索失败-num %i not success' % (name, num)
-            #tmplist = {'0': '可回收', '1': '有害', '2': '厨余(湿)', '3': '其他(干)'}
-            tmplist = ['可回收', '有害', '厨余(湿)', '其他(干)']
+            #typelist = {'0': '可回收', '1': '有害', '2': '厨余(湿)', '3': '其他(干)'}
+            #typelist = ['可回收', '有害', '厨余(湿)', '其他(干)']
             if mode==0:
-                return tmplist[jsoncon['newslist'][0]['type']]
+                return typelist[jsoncon['newslist'][0]['type']]
             elif mode==1:
-                trashtype=tmplist[jsoncon['newslist'][0]['type']]
+                trashtype=typelist[jsoncon['newslist'][0]['type']]
                 explain=jsoncon['newslist'][0]['explain']
                 contain=jsoncon['newslist'][0]['contain']
                 tip=jsoncon['newslist'][0]['tip']

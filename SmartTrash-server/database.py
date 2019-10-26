@@ -32,11 +32,12 @@ mydb = mysql.connector.connect(
 )
 
 def getType(name):
+    print(name)
     mycursor = mydb.cursor()
     mycursor.execute('use smarttrash')
-    mycursor.execute('SELECT * FROM typelist WHERE name="%s"'%(name))
+    mycursor.execute('SELECT type FROM typelist WHERE name="%s"'%(name))
     result = mycursor.fetchone()     # fetchall() 获取所有记录
-    print('isexist:'+str(result))
+    print('getType:'+str(result))
     return result
 
 def addType(name,trashtype):
