@@ -33,7 +33,10 @@ def getType(name,mode=0):
     if main.usedb:
         dbresult=database.getType(name)
         if dbresult!=None:
-            return typelist[dbresult[0]]
+            result=dbresult[0]
+            database.addHistory(name,result)
+            print('result:'+typelist[result])
+            return typelist[result]
     url = getURL(name)
     print('fullurl:'+url)
     req = urllib.request.Request(url)
@@ -41,6 +44,10 @@ def getType(name,mode=0):
         'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.35 Safari/537.36')
     r = urllib.request.urlopen(req)
     result = getResponse(name,r.read().decode('utf-8'),mode)
+    if type(result)==int:
+        if main.usedb:
+            database.addHistory(name,result)
+        result=typelist[result]
     print('result:'+result)
     return result
 
@@ -56,7 +63,7 @@ def getResponse(name, content,mode):
             #typelist = {'0': '可回收', '1': '有害', '2': '厨余(湿)', '3': '其他(干)'}
             #typelist = ['可回收', '有害', '厨余(湿)', '其他(干)']
             if mode==0:
-                return typelist[jsoncon['newslist'][0]['type']]
+                return jsoncon['newslist'][0]['type']
             elif mode==1:
                 trashtype=typelist[jsoncon['newslist'][0]['type']]
                 explain=jsoncon['newslist'][0]['explain']
