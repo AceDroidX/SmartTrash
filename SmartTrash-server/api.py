@@ -3,7 +3,7 @@ import json
 import traceback
 import urllib.parse
 import string
-import APIKey
+import APIKey,database,main
 thkey = APIKey.th_key
 gets = [
     "https://laji.lr3800.com/api.php?name=",
@@ -28,17 +28,21 @@ def getURL(name):
         print('err:api.num:%ilen:%i' % (num, len(gets)))
         return urllib.parse.quote(gets[3]+name, safe=string.printable)
 
-def getType(self,name,mode=0):
-        name=urllib.parse.quote(name, safe=string.printable)
-        url = getURL(name)
-        print('fullurl:'+url)
-        req = urllib.request.Request(url)
-        req.add_header(
-            'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.35 Safari/537.36')
-        r = urllib.request.urlopen(req)
-        result = getResponse(urllib.parse.unquote(name),r.read().decode('utf-8'),mode)
-        print('result:'+result)
-        return result
+def getType(name,mode=0):
+    if main.usedb:
+        dbresult=database.getType(name)
+        if dbresult!=None:
+            return dbresult
+    name=urllib.parse.quote(name, safe=string.printable)
+    url = getURL(name)
+    print('fullurl:'+url)
+    req = urllib.request.Request(url)
+    req.add_header(
+        'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.35 Safari/537.36')
+    r = urllib.request.urlopen(req)
+    result = getResponse(urllib.parse.unquote(name),r.read().decode('utf-8'),mode)
+    print('result:'+result)
+    return result
 
 def getResponse(name, content,mode):
     try:

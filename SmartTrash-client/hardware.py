@@ -18,6 +18,8 @@ def angle2duty(degree):
 
 def init():
     global pi
+    if pi != None:
+        return
     cmd = os.popen('ps -Al|grep pigpiod').read()
     if cmd.find('pigpiod') == -1:
         os.popen('sudo pigpiod')

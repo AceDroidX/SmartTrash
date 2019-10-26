@@ -9,7 +9,7 @@ import urllib.request
 import urllib.parse
 from PIL import Image
 import sys,io,uuid,json,time,string
-import api,main
+import api,main,database
 
 sys.path.append('../SmartTrash-client')
 from image import token, image_to_base64, image_classify
