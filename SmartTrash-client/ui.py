@@ -47,13 +47,13 @@ def updateui():
     tk.Button(w2, text=typelist[2]+'垃圾', font=('Arial', 24), width=20, height=2, command=lambda:updatetype(name,2)).pack()
     tk.Button(w2, text=typelist[3]+'垃圾', font=('Arial', 24), width=20, height=2, command=lambda:updatetype(name,3)).pack()
     w2.mainloop()
-    
-def updatetype(name,trashtype):
+
+def updatetype(name,ttype):
     global trashtype
-    image.updatetype(name,trashtype)
+    image.updatetype(name,ttype)
     w2.destroy()
     if trashtype.find('无分类')!=-1:
-        hardware.run(trashtype)
+        hardware.run(ttype)
         trashtype='已提交错误'
 
 def run():

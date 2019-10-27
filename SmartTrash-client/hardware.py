@@ -54,6 +54,8 @@ def run(trashtype):
     global changetime
     if pi == None:
         init()
+    if type(trashtype)==int:
+        trashtype=str(trashtype)
     #'可回收', '有害', '厨余(湿)', '其他(干)'
     if trashtype == '可回收' or trashtype == '0':
         change(IN1, 40)
