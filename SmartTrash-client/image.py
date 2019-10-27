@@ -100,3 +100,10 @@ def getType(name):
     content = urllib.request.urlopen(request).read().decode("utf-8")
     print(content)  # debug
     return content
+
+def updatetype(name,trashtype):
+    host = urllib.parse.quote(APIKey.updatetype_host+name+'/'+str(trashtype), safe=string.printable)
+    request = urllib.request.Request(host)
+    content = urllib.request.urlopen(request).read().decode("utf-8")
+    print('image.updatetype:'+content)
+    return content
