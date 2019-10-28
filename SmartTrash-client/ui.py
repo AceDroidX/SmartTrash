@@ -14,15 +14,6 @@ window = None
 l = None
 b1 = None
 
-
-def init():
-    global window
-    global l
-    global b1
-    window = tk.Tk()
-    window.title('SmartTrash')
-    window.geometry('1280x720')
-    var = tk.StringVar()
     #l = tk.Label(window, textvariable=var, bg='white', fg='black', font=('Arial', 12), width=30, height=2)
     # l.pack()
     #b1 = tk.Button(window, text='hit me', font=('Arial', 12), width=10, height=1, command=hit_me)
@@ -60,6 +51,7 @@ def run():
     global l
     global name
     global trashtype
+    global window
     # result=main.run()
     # l.config(text=result[0]+'\n'+result[1])
     l.config(text='拍摄照片中')
@@ -82,18 +74,23 @@ def start():
     global window
     global l
     global wrong
-    if window == None:
-        init()
+    global b1
+    window = tk.Tk()
+    window.title('SmartTrash')
+    window.geometry('1280x720')
+    var = tk.StringVar()
     # b1.destroy()
     l = tk.Label(window, bg='white', fg='black', font=('Arial', 24), width=60, height=4)
     l.pack()
     take = tk.Button(window, text='拍摄并识别', font=('Arial', 24), width=20, height=2, command=run)
     take.pack()
+    if main.usedist:
+        take.config(text='自动识别已开启')
+        take.config(state='disabled')
     wrong = tk.Button(window, text='觉得分类有问题？点击提交错误', font=('Arial', 24), width=25, height=2, command=updateui,state='disabled')
     wrong.pack()
     window.mainloop()
 
 
 if __name__ == '__main__':
-    init()
     start()

@@ -4,12 +4,13 @@ import sys
 import threading
 import os
 import image
-import hardware
+import hardware,distance
 import ui
 
 isdebug = True
 showui=True
 resetonstart=True
+usedist=True
 
 cmd = ''
 
@@ -43,6 +44,8 @@ if __name__ == '__main__':
         ui.startui()
     if resetonstart:
         hardware.reset()
+    if usedist:
+        distance.startThread()
     # loop
     while True:
         cmd = input("wxx>")
@@ -66,6 +69,8 @@ if __name__ == '__main__':
             image.getType(image.result['result'][0]['keyword']+'/'+image.result['result'][0]['root'])
         elif cmd == 'run':
             run()
+        elif cmd == 'setdist':
+            distance.distmin=float(input('input the distmin:'))
         elif cmd == '':
             pass
         else:

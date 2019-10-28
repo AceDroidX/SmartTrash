@@ -1,1 +1,1 @@
-lxterminal -e python3 /home/ubuntu/SmartTrash/SmartTrash-client/main.py
+lxterminal -e python3 /home/pi/SmartTrash/SmartTrash-client/main.py
