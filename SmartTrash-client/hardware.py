@@ -6,7 +6,7 @@ IN1 = 18
 IN2 = 23
 changetime = 1
 pi = None
-
+turnangle=60
 
 def angle2duty(degree):
     if degree > 180 or degree < 0:
@@ -28,6 +28,7 @@ def init():
     pi.set_PWM_frequency(IN1, 50)
     pi.set_PWM_range(IN1, 2000)
     pi.set_PWM_dutycycle(IN1, angle2duty(90))
+    time.sleep(changetime)
     pi.set_PWM_frequency(IN2, 50)
     pi.set_PWM_range(IN2, 2000)
     pi.set_PWM_dutycycle(IN2, angle2duty(90))
@@ -58,23 +59,24 @@ def run(trashtype):
         trashtype=str(trashtype)
     #'可回收', '有害', '厨余(湿)', '其他(干)'
     if trashtype == '可回收' or trashtype == '0':
-        change(IN1, 40)
+        change(IN1, 90-turnangle)
         time.sleep(changetime)
-        change(IN2, 40)
+        change(IN2, 90-turnangle)
     elif trashtype == '有害' or trashtype == '1':
-        change(IN1, 40)
+        change(IN1, 90-turnangle)
         time.sleep(changetime)
-        change(IN2, 140)
+        change(IN2, 90+turnangle)
     elif trashtype == '厨余(湿)' or trashtype == '2':
-        change(IN1, 140)
+        change(IN1, 90+turnangle)
         time.sleep(changetime)
-        change(IN2, 40)
+        change(IN2, 90-turnangle)
     elif trashtype == '其他(干)' or trashtype == '3':
-        change(IN1, 140)
+        change(IN1, 90+turnangle)
         time.sleep(changetime)
-        change(IN2, 140)
+        change(IN2, 90+turnangle)
     else:
         print('err:hardware run trashtype')
+    time.sleep(changetime)
     reset()
 
 
