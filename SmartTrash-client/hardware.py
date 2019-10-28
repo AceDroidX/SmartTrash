@@ -38,6 +38,7 @@ def change(port, angle):
     global pi
     if pi == None:
         init()
+    print('change angle:'+str(port)+'    '+str(angle))
     pi.set_PWM_dutycycle(port, angle2duty(angle))
 
 

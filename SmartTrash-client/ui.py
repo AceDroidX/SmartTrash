@@ -77,6 +77,7 @@ def run():
     else:
         l.config(text='这是[%s]\n%s' % (name, trashtype))
         wrong.config(state='normal')
+    historyui()
 
 
 def start():
@@ -105,7 +106,6 @@ def start():
         history.insert("end", '垃圾投入历史记录')
         historyui()
     window.mainloop()
-
 
 if __name__ == '__main__':
     start()

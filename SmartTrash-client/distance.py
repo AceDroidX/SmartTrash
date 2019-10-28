@@ -4,8 +4,8 @@ import time
 import ui
 import threading
  
-distmin=10
-whiletime=2
+distmin=25
+whiletime=1
  
 #设置 GPIO 模式为 BCM
 GPIO.setmode(GPIO.BCM)
