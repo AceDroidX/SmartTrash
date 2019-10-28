@@ -11,6 +11,7 @@ isdebug = True
 showui=True
 resetonstart=True
 usedist=True
+uihistory=True
 
 cmd = ''
 
@@ -71,6 +72,8 @@ if __name__ == '__main__':
             run()
         elif cmd == 'setdist':
             distance.distmin=float(input('input the distmin:'))
+        elif cmd == 'setdisttime':
+            distance.whiletime=float(input('input the whiletime:'))
         elif cmd == '':
             pass
         else:

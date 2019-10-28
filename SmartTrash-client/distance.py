@@ -2,8 +2,10 @@
 import RPi.GPIO as GPIO
 import time
 import ui
+import threading
  
 distmin=10
+whiletime=2
  
 #设置 GPIO 模式为 BCM
 GPIO.setmode(GPIO.BCM)
@@ -41,11 +43,11 @@ def start():
     while True:
         global dist
         dist = distance()
-        print("Measured Distance = {:.2f} cm".format(dist))
+        print("Measured Distance = {:.2f} cm".format(dist))#debug
         if dist<distmin:
             print('distance.start:dist<distmin')
             ui.run()
-        time.sleep(1)
+        time.sleep(whiletime)
         
 def startThread():
     serverThread = threading.Thread(target=start)

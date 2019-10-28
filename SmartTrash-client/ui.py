@@ -2,7 +2,7 @@ import tkinter as tk
 import main
 import image
 import hardware
-import threading
+import threading,json
 typelist = ['可回收', '有害', '厨余(湿)', '其他(干)']
 
 def startui():
@@ -39,6 +39,15 @@ def updateui():
     tk.Button(w2, text=typelist[3]+'垃圾', font=('Arial', 24), width=20, height=2, command=lambda:updatetype(name,3)).pack()
     w2.mainloop()
 
+def historyui():
+    global history
+    history.delete(0,history.size()-1)
+    history.insert("end", '垃圾投入历史记录')
+    result=json.loads(image.getHistory())
+    for item in result:
+        oneresult='垃圾名:%s  类型:%s  投入时间:%s'%(item[1],typelist[int(item[2])],item[3])
+        history.insert("end", oneresult)
+        
 def updatetype(name,ttype):
     global trashtype
     image.updatetype(name,ttype)
@@ -75,6 +84,7 @@ def start():
     global l
     global wrong
     global b1
+    global history
     window = tk.Tk()
     window.title('SmartTrash')
     window.geometry('1280x720')
@@ -89,6 +99,11 @@ def start():
         take.config(state='disabled')
     wrong = tk.Button(window, text='觉得分类有问题？点击提交错误', font=('Arial', 24), width=25, height=2, command=updateui,state='disabled')
     wrong.pack()
+    if main.uihistory:
+        history = tk.Listbox(window, font=('Arial', 24),width=60,height=10)
+        history.pack()
+        history.insert("end", '垃圾投入历史记录')
+        historyui()
     window.mainloop()
 
 

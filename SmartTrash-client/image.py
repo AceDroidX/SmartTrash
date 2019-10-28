@@ -107,3 +107,10 @@ def updatetype(name,trashtype):
     content = urllib.request.urlopen(request).read().decode("utf-8")
     print('image.updatetype:'+content)
     return content
+
+def getHistory():
+    host = urllib.parse.quote(APIKey.history_host, safe=string.printable)
+    request = urllib.request.Request(host)
+    content = urllib.request.urlopen(request).read().decode("utf-8")
+    #print('image.getHistory:'+content)
+    return content

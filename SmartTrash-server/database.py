@@ -83,6 +83,6 @@ def getHistory():
     mycursor.execute('use smarttrash')
     mycursor.execute('SELECT * FROM history ORDER BY time DESC LIMIT 100')
     result = mycursor.fetchall()     # fetchall() 获取所有记录
-    print('getType:'+str(result))
+    #print('getType:'+str(result))
     mycursor.close()
     return result
