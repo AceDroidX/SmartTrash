@@ -24,13 +24,17 @@ imglist = []
 class Server(http.server.SimpleHTTPRequestHandler):
     sendstr = ""
 
-    def send(self, string):
+    def send(self, string,log=True):
         global threadLock
         self.sendstr = string
         threadLock.acquire()
         with open('log.txt', 'a',encoding='utf-8') as f:
-            f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()
-                    )+"---"+self.address_string()+"--->[send]"+string+"\n")
+            if log:
+                f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()
+                        )+"---"+self.address_string()+"--->[send]"+string+"\n")
+            else:
+                f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()
+                        )+"---"+self.address_string()+"--->[send,log=False]"+"\n")
         threadLock.release()
         self.protocol_version = 'HTTP/1.1'
         self.send_response(200)
@@ -64,7 +68,7 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 self.send(result)
             elif params[1] == 'name-multi':
                 tmp=[]
-                for i in len(params)-2:
+                for i in range(len(params)-2):
                     tmp.append(params[i+1])
                 result = api.getType_multi(tmp)
                 self.send(json.dumps(result,ensure_ascii=False))
@@ -84,7 +88,7 @@ class Server(http.server.SimpleHTTPRequestHandler):
                     return
                 try:
                     result=database.getHistory()
-                    self.send(json.dumps(result,ensure_ascii=False,default=str))
+                    self.send(json.dumps(result,ensure_ascii=False,default=str),log=False)
                 except:
                     self.send('err:服务器数据库读取失败')
                     raise

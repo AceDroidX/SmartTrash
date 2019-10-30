@@ -47,8 +47,6 @@ if __name__ == '__main__':
             stop()
         elif cmd[0] == "about" or cmd[0] == "version":
             about()
-        elif cmd[0] == 'change':
-            api.num=int(cmd[1])
         elif cmd[0] == '':
             pass
         else:
