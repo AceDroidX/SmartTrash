@@ -15,10 +15,10 @@ def getType(name,mode=0):
         if dbresult!=None:
             result=dbresult[0]
             database.addHistory(name,result)
-            print('result:'+typelist[result])
+            print('api.getType.result:'+typelist[result])
             return typelist[result]
     url = urllib.parse.quote(type_url+name, safe=string.printable)
-    print('fullurl:'+url)
+    print('api.getType.fullurl:'+url)
     req = urllib.request.Request(url)
     req.add_header(
         'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.35 Safari/537.36')
@@ -28,13 +28,14 @@ def getType(name,mode=0):
         if main.usedb:
             database.addHistory(name,result)
         result=typelist[result]
-    print('result:'+result)
+    print('api.getType.result:'+result)
     return result
 
 def getType_multi(namelist):
     tmp=[]
     for name in namelist:
         tmp.append(getType(name,0))
+    print("api.getType_multi:"+tmp)
     return tmp
 
 def getResponse(name, content,mode):

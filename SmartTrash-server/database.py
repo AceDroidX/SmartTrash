@@ -1,18 +1,31 @@
 import mysql.connector
 import APIKey
 
-def getType(name):
+def connect():
+    global mydb
+    global mycursor
     mydb = mysql.connector.connect(
     host=APIKey.mysql_host,
     user=APIKey.mysql_user,
     passwd=APIKey.mysql_password)
     mycursor = mydb.cursor()
+    return mycursor
+
+def close():
+    global mydb
+    global mycursor
+    mycursor.close()
+    mydb.close()
+    
+def getType(name):
+    global mydb
+    global mycursor
+    connect()
     mycursor.execute('use smarttrash')
     mycursor.execute('SELECT type FROM typelist WHERE name="%s"' % (name))
     result = mycursor.fetchone()     # fetchall() 获取所有记录
-    print('getType:'+str(result))
-    mycursor.close()
-    mydb.close()
+    print('database.getType:'+str(result))
+    close()
     return result
 
 
@@ -25,64 +38,57 @@ def dbUpdate(name, trashtype):
 
 
 def addType(name, trashtype):
-    mydb = mysql.connector.connect(
-    host=APIKey.mysql_host,
-    user=APIKey.mysql_user,
-    passwd=APIKey.mysql_password)
-    print('addType:name:%strashtype:%s' % (name, trashtype))
+    global mydb
+    global mycursor
+    connect()
+    print('database.addType:name:%strashtype:%s' % (name, trashtype))
     mycursor = mydb.cursor()
     mycursor.execute('use smarttrash')
     mycursor.execute(
         'INSERT INTO typelist (name, type, time) VALUES ("%s", %s, NOW());' % (name, trashtype))
     mydb.commit()
-    mycursor.close()
-    mydb.close()
+    close()
     return mycursor.rowcount
 
 
 def updateType(name, trashtype):
-    mydb = mysql.connector.connect(
-    host=APIKey.mysql_host,
-    user=APIKey.mysql_user,
-    passwd=APIKey.mysql_password)
-    print('updateType:name:%strashtype:%s' % (name, trashtype))
+    global mydb
+    global mycursor
+    connect()
+    print('database.updateType:name:%strashtype:%s' % (name, trashtype))
     mycursor = mydb.cursor()
     mycursor.execute('use smarttrash')
     mycursor.execute(
         'UPDATE typelist SET type=%s WHERE name="%s"' % (trashtype, name))
     mydb.commit()
-    mycursor.close()
-    mydb.close()
+    close()
     return mycursor.rowcount
 
 
 def addHistory(name, trashtype):
-    mydb = mysql.connector.connect(
-    host=APIKey.mysql_host,
-    user=APIKey.mysql_user,
-    passwd=APIKey.mysql_password)
+    global mydb
+    global mycursor
+    connect()
     if type(trashtype) == int:
         trashtype = str(trashtype)
-    print('addHistory:name:%strashtype:%s' % (name, trashtype))
+    print('database.addHistory:[name:%strashtype:%s]' % (name, trashtype))
     mycursor = mydb.cursor()
     mycursor.execute('use smarttrash')
     mycursor.execute(
         'INSERT INTO history (name, type, time) VALUES ("%s", %s, NOW());' % (name, trashtype))
     mydb.commit()
-    mycursor.close()
-    mydb.close()
+    close()
     return mycursor.rowcount
 
 
 def getHistory():
-    mydb = mysql.connector.connect(
-    host=APIKey.mysql_host,
-    user=APIKey.mysql_user,
-    passwd=APIKey.mysql_password)
+    global mydb
+    global mycursor
+    connect()
     mycursor = mydb.cursor()
     mycursor.execute('use smarttrash')
     mycursor.execute('SELECT * FROM history ORDER BY time DESC LIMIT 100')
     result = mycursor.fetchall()     # fetchall() 获取所有记录
     #print('getType:'+str(result))
-    mycursor.close()
+    close()
     return result
