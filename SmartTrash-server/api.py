@@ -35,7 +35,7 @@ def getType_multi(namelist):
     tmp=[]
     for name in namelist:
         tmp.append(getType(name,0))
-    print("api.getType_multi:"+tmp)
+    print("api.getType_multi:"+str(tmp))
     return tmp
 
 def getResponse(name, content,mode):
