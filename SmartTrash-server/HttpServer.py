@@ -62,6 +62,12 @@ class Server(http.server.SimpleHTTPRequestHandler):
             elif params[1] == 'namem1':
                 result = api.getType(params[2],1)
                 self.send(result)
+            elif params[1] == 'name-multi':
+                tmp=[]
+                for i in len(params)-2:
+                    tmp.append(params[i+1])
+                result = api.getType_multi(tmp)
+                self.send(json.dumps(result,ensure_ascii=False))
             elif params[1] == 'db-update':
                 if main.usedb==False:
                     self.send('err:服务器关闭了数据添加功能')

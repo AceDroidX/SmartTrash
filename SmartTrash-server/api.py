@@ -6,27 +6,7 @@ import string
 import APIKey,database,main
 thkey = APIKey.th_key
 typelist = ['可回收', '有害', '厨余(湿)', '其他(干)']
-gets = [
-    "https://laji.lr3800.com/api.php?name=",
-    'http://api.choviwu.top/garbage/getGarbage?garbageName=',
-    'https://www.lajiflw.cn/rubbish/search?q=',
-    'https://quark.sm.cn/api/quark_sug?q=',
-    'https://nodeapi.yunser.com/waste/search?name=',
-    'https://api.tianapi.com/txapi/lajifenlei?num=5&key=%s&word=' % (thkey)
-]
-posts = [
-
-]
-num = 5
-
-def getURL(name):
-    if name == '':
-        raise 'name cant be blank'
-    if num < len(gets):
-        return urllib.parse.quote(gets[num]+name, safe=string.printable)
-    else:
-        print('err:api.num:%ilen:%i' % (num, len(gets)))
-        return urllib.parse.quote(gets[3]+name, safe=string.printable)
+type_url='https://api.tianapi.com/txapi/lajifenlei?num=5&key=%s&word=' % (thkey)
 
 def getType(name,mode=0):
     name=urllib.parse.unquote(name)
@@ -37,7 +17,7 @@ def getType(name,mode=0):
             database.addHistory(name,result)
             print('result:'+typelist[result])
             return typelist[result]
-    url = getURL(name)
+    url = urllib.parse.quote(type_url+name, safe=string.printable)
     print('fullurl:'+url)
     req = urllib.request.Request(url)
     req.add_header(
@@ -51,50 +31,34 @@ def getType(name,mode=0):
     print('result:'+result)
     return result
 
+def getType_multi(namelist):
+    tmp=[]
+    for name in namelist:
+        tmp.append(getType(name,0))
+    return tmp
+
 def getResponse(name, content,mode):
     try:
         jsoncon = json.loads(content)
         response = ''
-        if num == 0 or num == 5:
-            if content.find('250')!=-1:
-                return '很抱歉，您当前搜索的[%s]暂无分类结果，请您通过“垃圾图鉴”查询'%(name)
-            if jsoncon['msg'] != 'success':
-                return '[%s]err:分类检索失败-num %i not success' % (name, num)
-            #typelist = {'0': '可回收', '1': '有害', '2': '厨余(湿)', '3': '其他(干)'}
-            #typelist = ['可回收', '有害', '厨余(湿)', '其他(干)']
-            if mode==0:
-                return jsoncon['newslist'][0]['type']
-            elif mode==1:
-                trashtype=typelist[jsoncon['newslist'][0]['type']]
-                explain=jsoncon['newslist'][0]['explain']
-                contain=jsoncon['newslist'][0]['contain']
-                tip=jsoncon['newslist'][0]['tip']
-                return '您当前搜索的是[%s]，属于[%s]垃圾\n\n分类解释:%s\n\n包含类型:%s\n\n投放提示:%s'%(name,trashtype,explain,contain,tip)
-            else:
-                return 'err:mode'
-        elif num == 1:
-            if jsoncon['msg'] != 'success':
-                return '[%s]分类检索失败-num %i not success' % (name, num)
-            return jsoncon['data'][0]['gType']
-        elif num == 2:
-            if jsoncon['msg'] != '获取成功！':
-                return '[%s]分类检索失败-num %i not success' % (name, num)
-            return jsoncon['data'][0]['itemCategory']
-        elif num == 3:
-            if jsoncon['msg'] != 'succ':
-                return '[%s]分类检索失败-num %i not success' % (name, num)
-            return jsoncon['data']['value'][0]['style']['answer']
-        elif num == 4:
-            return jsoncon['type']
+        if content.find('250')!=-1:
+            return '很抱歉，您当前搜索的[%s]暂无分类结果，请您通过“垃圾图鉴”查询'%(name)
+        if jsoncon['msg'] != 'success':
+            return '[%s]err:分类检索失败-not success' % (name)
+        #typelist = {'0': '可回收', '1': '有害', '2': '厨余(湿)', '3': '其他(干)'}
+        #typelist = ['可回收', '有害', '厨余(湿)', '其他(干)']
+        if mode==0:
+            return jsoncon['newslist'][0]['type']
+        elif mode==1:
+            trashtype=typelist[jsoncon['newslist'][0]['type']]
+            explain=jsoncon['newslist'][0]['explain']
+            contain=jsoncon['newslist'][0]['contain']
+            tip=jsoncon['newslist'][0]['tip']
+            return '您当前搜索的是[%s]，属于[%s]垃圾\n\n分类解释:%s\n\n包含类型:%s\n\n投放提示:%s'%(name,trashtype,explain,contain,tip)
         else:
-            return '[%s]分类检索失败-num %i not exist' % (name, num)
+            return 'err:mode'
     except KeyError as e:
-        if num == 3:
-            return 'err:[%s]分类检索失败-num %i is not a trash' % (name, num)
-        elif num == 4:
-            return 'err:[%s]分类检索失败-num %i is not a trash' % (name, num)
-        else:
-            raise
+        return 'err:[%s]分类检索失败-is not a trash' % (name)
     except Exception as e:
         exc_type, exc_value, exc_traceback_obj = sys.exc_info()
         traceback.print_exception(

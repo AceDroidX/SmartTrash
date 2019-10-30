@@ -5,13 +5,14 @@ import threading
 import os
 import image
 import hardware,distance
-import ui
+import ui,APIKey
 
 isdebug = True
 showui=True
 resetonstart=True
 usedist=True
 uihistory=True
+checknet=True
 
 cmd = ''
 
@@ -33,6 +34,12 @@ def run():
     hardware.run(trashtype)
     return [name,trashtype]
 
+def netchecker():
+    host = urllib.parse.quote(APIKey.netchecker_url, safe=string.printable)
+    request = urllib.request.Request(host)
+    content = urllib.request.urlopen(request,timeout=2).read().decode("utf-8")
+    return content=="SmartTrash"
+
 # -----------------------------
 if __name__ == '__main__':
     # setup
@@ -47,6 +54,9 @@ if __name__ == '__main__':
         hardware.reset()
     if usedist:
         distance.startThread()
+    if checknet:
+        if not netchecker():
+            print('网络连接异常')
     # loop
     while True:
         cmd = input("wxx>")
