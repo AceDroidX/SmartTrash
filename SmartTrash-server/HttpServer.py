@@ -93,6 +93,16 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 except:
                     self.send('err:服务器数据库读取失败')
                     raise
+            elif params[1] == 'db-addhistory':
+                if main.usedb==False:
+                    self.send('err:服务器关闭了数据添加功能')
+                    return
+                try:
+                    result=database.addHistory(params[2],params[3])
+                    self.send('success:'+str(result))
+                except:
+                    self.send('err:服务器数据库更新失败')
+                    raise
             elif params[1] == 'object_detection':
                 img = imgdic[querys['input'][0]]
                 origin = image_classify(img)

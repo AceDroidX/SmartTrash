@@ -9,19 +9,9 @@ def startui():
     serverThread = threading.Thread(target=start)
     serverThread.start()
 
-
 window = None
 l = None
 b1 = None
-
-    #l = tk.Label(window, textvariable=var, bg='white', fg='black', font=('Arial', 12), width=30, height=2)
-    # l.pack()
-    #b1 = tk.Button(window, text='hit me', font=('Arial', 12), width=10, height=1, command=hit_me)
-    # b1.pack()
-    #b2 = tk.Button(window, text='hit me', font=('Arial', 12), width=10, height=1, command=hit_me)
-    # b2.pack()
-    # window.mainloop()
-
 
 def ontake(path):
     if window == None:
@@ -33,10 +23,8 @@ def updateui():
     w2.title('SmartTrash')
     w2.geometry('1280x720')
     l = tk.Label(w2,text='您觉得这应该是什么垃圾', bg='white', fg='black', font=('Arial', 24), width=40, height=4).pack()
-    tk.Button(w2, text=typelist[0]+'垃圾', font=('Arial', 24), width=20, height=2, command=lambda:updatetype(name,0)).pack()
-    tk.Button(w2, text=typelist[1]+'垃圾', font=('Arial', 24), width=20, height=2, command=lambda:updatetype(name,1)).pack()
-    tk.Button(w2, text=typelist[2]+'垃圾', font=('Arial', 24), width=20, height=2, command=lambda:updatetype(name,2)).pack()
-    tk.Button(w2, text=typelist[3]+'垃圾', font=('Arial', 24), width=20, height=2, command=lambda:updatetype(name,3)).pack()
+    for i in range(4):
+        tk.Button(w2, text=typelist[i]+'垃圾', font=('Arial', 24), width=20, height=2, command=lambda:updatetype(name,i)).pack()
     w2.mainloop()
 
 def historyui():
@@ -56,13 +44,14 @@ def updatetype(name,ttype):
         hardware.run(ttype)
         trashtype='已提交错误'
 
+def selectname(num):
+    pass
+
 def run():
     global l
     global name
     global trashtype
     global window
-    # result=main.run()
-    # l.config(text=result[0]+'\n'+result[1])
     l.config(text='拍摄照片中')
     image.take()
     l.config(text='识别物品中')
@@ -79,6 +68,39 @@ def run():
         wrong.config(state='normal')
     historyui()
 
+def run_multi():
+    global l
+    global name
+    global trashtype
+    global window
+    global selectbtn
+    l.config(text='拍摄照片中')
+    image.take()
+    l.config(text='识别物品中')
+    ic=image.image_classify(image.image)
+    if str(ic).find('err'):
+        l.config(text='物品识别错误')
+        print(str(ic))
+    namelist=[]
+    for i in range(ic['result_num']):
+        namelist.append(ic['result'][i]['keyword'])
+    for i in range(4):
+        if i==0 or ic['result'][i]['score']>=0.5:
+            selectbtn[i].config(state='normal',text='您识别的垃圾是[%s]\n获取分类中' % (namelist[i]))
+        else:
+            selectbtn[i].config(state='disabled',text='')
+    typelist=[]
+    for i in range()
+    trashtype = image.getType(
+        image.result['result'][0]['keyword']+'/'+image.result['result'][0]['root'])
+    if trashtype.find('无分类')==-1:
+        l.config(text='您识别的垃圾是[%s]\n您识别的垃圾属于[%s]' % (name, trashtype))
+        wrong.config(state='normal')
+        hardware.run(trashtype)
+    else:
+        l.config(text='这是[%s]\n%s' % (name, trashtype))
+        wrong.config(state='normal')
+    historyui()
 
 def start():
     global window
@@ -93,11 +115,19 @@ def start():
     # b1.destroy()
     l = tk.Label(window, bg='white', fg='black', font=('Arial', 24), width=60, height=4)
     l.pack()
-    take = tk.Button(window, text='拍摄并识别', font=('Arial', 24), width=20, height=2, command=run)
-    take.pack()
-    if main.usedist:
-        take.config(text='自动识别已开启')
-        take.config(state='disabled')
+    if main.usemulti:
+        fm=tk.Frame(window)
+        selectbtn=[]
+        for i in range(4):
+            selectbtn.append(tk.Button(fm, text='', font=('Arial', 24), width=15, height=2, command=lambda:selectname(i),state='disabled'))
+            selectbtn[i].pack(side='left')
+        fm.pack()
+    else:
+        take = tk.Button(window, text='拍摄并识别', font=('Arial', 24), width=20, height=2, command=run)
+        take.pack()
+        if main.usedist:
+            take.config(text='自动识别已开启')
+            take.config(state='disabled')
     wrong = tk.Button(window, text='觉得分类有问题？点击提交错误', font=('Arial', 24), width=25, height=2, command=updateui,state='disabled')
     wrong.pack()
     if main.uihistory:

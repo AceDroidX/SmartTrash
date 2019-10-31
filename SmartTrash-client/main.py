@@ -13,6 +13,7 @@ resetonstart=True
 usedist=True
 uihistory=True
 checknet=True
+usemulti=True
 
 cmd = ''
 

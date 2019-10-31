@@ -1,7 +1,7 @@
 #导入 GPIO库
 import RPi.GPIO as GPIO
 import time
-import ui
+import ui,main
 import threading
  
 distmin=25
@@ -46,7 +46,10 @@ def start():
         print("Measured Distance = {:.2f} cm".format(dist))#debug
         if dist<distmin:
             print('distance.start:dist<distmin')
-            ui.run()
+            if usemulti:
+                ui.run_multi()
+            else:
+                ui.run()
         time.sleep(whiletime)
         
 def startThread():
