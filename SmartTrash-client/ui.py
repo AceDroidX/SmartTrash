@@ -19,10 +19,11 @@ def ontake(path):
 
 def updateui():
     global w2
+    global name
     w2 = tk.Tk()
     w2.title('SmartTrash')
     w2.geometry('1280x720')
-    l = tk.Label(w2,text='您觉得这应该是什么垃圾', bg='white', fg='black', font=('Arial', 24), width=40, height=4).pack()
+    l = tk.Label(w2,text='您觉得[%s]应该是什么垃圾'%(name), bg='white', fg='black', font=('Arial', 24), width=40, height=4).pack()
     for i in range(4):
         tk.Button(w2, text=typelist[i]+'垃圾', font=('Arial', 24), width=20, height=2, command=lambda:updatetype(name,i)).pack()
     w2.mainloop()
@@ -39,6 +40,9 @@ def historyui():
 def updatetype(name,ttype):
     global trashtype
     image.updatetype(name,ttype)
+    if main.usemulti:
+        image.addHistory(name,trashtype)
+        historyui()
     w2.destroy()
     if trashtype.find('无分类')!=-1:
         hardware.run(ttype)
@@ -99,8 +103,8 @@ def run_multi():
         else:
             selectbtn[i].config(text='这是[%s]\n%s' % (finalname[i], '暂无分类结果'))
     selectnum=0
-    l.config(text='请选出相对正确的结果\n3秒后默认选择第一个结果')
-    time.sleep(3)
+    l.config(text='请选出相对正确的结果\n10秒后默认选择第一个结果')
+    time.sleep(10)
     #wrong.config(state='normal')
     name=finalname[selectnum]
     trashtype=typelist[selectnum]
@@ -113,6 +117,8 @@ def run_multi():
     else:
         l.config(text='这是[%s]\n%s' % (name, trashtype))
         wrong.config(state='normal')
+    for i in range(4):
+        selectbtn[i].config(text='',state='disabled')
     #hardware.run(trashtype)
 
 def start():

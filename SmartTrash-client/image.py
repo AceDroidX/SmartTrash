@@ -126,7 +126,7 @@ def getHistory():
     return content
 
 def addHistory(name,trashtype):
-    host = urllib.parse.quote(APIKey.addhistory_host+name+trashtype'/'+trashtype, safe=string.printable)
+    host = urllib.parse.quote(APIKey.addhistory_host+name+trashtype+'/'+trashtype, safe=string.printable)
     request = urllib.request.Request(host)
     content = urllib.request.urlopen(request).read().decode("utf-8")
     #print('image.getHistory:'+content)
