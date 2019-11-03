@@ -43,7 +43,7 @@ def start():
     while True:
         global dist
         dist = distance()
-        print("Measured Distance = {:.2f} cm".format(dist))#debug
+        #print("Measured Distance = {:.2f} cm".format(dist))#debug
         if dist<distmin:
             print('distance.start:dist<distmin')
             if main.usemulti:

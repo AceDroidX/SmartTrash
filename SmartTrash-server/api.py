@@ -60,7 +60,7 @@ def getResponse(name, content,mode):
             tip=jsoncon['newslist'][0]['tip']
             return '您当前搜索的是[%s]，属于[%s]垃圾\n\n分类解释:%s\n\n包含类型:%s\n\n投放提示:%s'%(name,trashtype,explain,contain,tip)
         else:
-            return 'err:mode'
+            return jsoncon['newslist'][0]['type']
     except KeyError as e:
         return 'err:[%s]分类检索失败-is not a trash' % (name)
     except Exception as e:

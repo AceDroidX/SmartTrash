@@ -51,6 +51,7 @@ def updatetype(name,ttype):
 def selectname(num):
     global selectnum
     selectnum=num
+    print("ui.selectname.num="+str(num))
 
 def run():
     global l
