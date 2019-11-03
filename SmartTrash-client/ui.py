@@ -2,7 +2,7 @@ import tkinter as tk
 import main
 import image
 import hardware
-import threading,json
+import threading,json,time
 typelist = ['可回收', '有害', '厨余(湿)', '其他(干)']
 
 def startui():
@@ -45,7 +45,8 @@ def updatetype(name,ttype):
         trashtype='已提交错误'
 
 def selectname(num):
-    pass
+    global selectnum
+    selectnum=num
 
 def run():
     global l
@@ -78,29 +79,41 @@ def run_multi():
     image.take()
     l.config(text='识别物品中')
     ic=image.image_classify(image.image)
-    if str(ic).find('err'):
+    if str(ic).find('err')!=-1:
         l.config(text='物品识别错误')
         print(str(ic))
     namelist=[]
     for i in range(ic['result_num']):
         namelist.append(ic['result'][i]['keyword'])
+    finalname=[]
     for i in range(4):
         if i==0 or ic['result'][i]['score']>=0.5:
-            selectbtn[i].config(state='normal',text='您识别的垃圾是[%s]\n获取分类中' % (namelist[i]))
+            finalname.append(namelist[i])
+            selectbtn[i].config(state='normal',text='这是[%s]\n获取分类中' % (namelist[i]))
         else:
             selectbtn[i].config(state='disabled',text='')
-    typelist=[]
-    for i in range()
-    trashtype = image.getType(
-        image.result['result'][0]['keyword']+'/'+image.result['result'][0]['root'])
+    typelist=json.loads(image.getType_multi(finalname))
+    for i in range(len(typelist)):
+        if typelist[i].find('无分类')==-1:
+            selectbtn[i].config(text='这是[%s]\n属于[%s]' % (finalname[i], typelist[i]))
+        else:
+            selectbtn[i].config(text='这是[%s]\n%s' % (finalname[i], '暂无分类结果'))
+    selectnum=0
+    l.config(text='请选出相对正确的结果\n3秒后默认选择第一个结果')
+    time.sleep(3)
+    #wrong.config(state='normal')
+    name=finalname[selectnum]
+    trashtype=typelist[selectnum]
     if trashtype.find('无分类')==-1:
         l.config(text='您识别的垃圾是[%s]\n您识别的垃圾属于[%s]' % (name, trashtype))
         wrong.config(state='normal')
         hardware.run(trashtype)
+        image.addHistory(name,trashtype)
+        historyui()
     else:
         l.config(text='这是[%s]\n%s' % (name, trashtype))
         wrong.config(state='normal')
-    historyui()
+    #hardware.run(trashtype)
 
 def start():
     global window
@@ -108,6 +121,7 @@ def start():
     global wrong
     global b1
     global history
+    global selectbtn
     window = tk.Tk()
     window.title('SmartTrash')
     window.geometry('1280x720')

@@ -161,7 +161,7 @@ class Server(http.server.SimpleHTTPRequestHandler):
             # img.save('/mnt/f/image.jpg')
             threadLock.acquire()
             imgid = str(uuid.uuid4())
-            if len(imglist) >= 10:
+            if len(imglist) >= 2:
                 imgdic.pop(imglist.pop(0))
             imglist.append(imgid)
             imgdic[imgid] = img

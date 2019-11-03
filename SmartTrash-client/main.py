@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 import sys
 import threading
-import os
+import os,urllib,string
 import image
 import hardware,distance
 import ui,APIKey

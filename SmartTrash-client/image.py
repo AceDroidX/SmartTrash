@@ -101,6 +101,16 @@ def getType(name):
     print(content)  # debug
     return content
 
+def getType_multi(name):    
+    host = urllib.parse.quote(APIKey.type_multi_host+'/'.join(name), safe=string.printable)
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    request = urllib.request.Request(host, headers=headers)
+    content = urllib.request.urlopen(request).read().decode("utf-8")
+    print(content)  # debug
+    return content
+
 def updatetype(name,trashtype):
     host = urllib.parse.quote(APIKey.updatetype_host+name+'/'+str(trashtype), safe=string.printable)
     request = urllib.request.Request(host)
@@ -110,6 +120,13 @@ def updatetype(name,trashtype):
 
 def getHistory():
     host = urllib.parse.quote(APIKey.history_host, safe=string.printable)
+    request = urllib.request.Request(host)
+    content = urllib.request.urlopen(request).read().decode("utf-8")
+    #print('image.getHistory:'+content)
+    return content
+
+def addHistory(name,trashtype):
+    host = urllib.parse.quote(APIKey.addhistory_host+name+trashtype'/'+trashtype, safe=string.printable)
     request = urllib.request.Request(host)
     content = urllib.request.urlopen(request).read().decode("utf-8")
     #print('image.getHistory:'+content)

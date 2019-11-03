@@ -14,7 +14,8 @@ def getType(name,mode=0):
         dbresult=database.getType(name)
         if dbresult!=None:
             result=dbresult[0]
-            database.addHistory(name,result)
+            if mode!=2:
+                database.addHistory(name,result)
             print('api.getType.result:'+typelist[result])
             return typelist[result]
     url = urllib.parse.quote(type_url+name, safe=string.printable)
@@ -34,7 +35,7 @@ def getType(name,mode=0):
 def getType_multi(namelist):
     tmp=[]
     for name in namelist:
-        tmp.append(getType(name,0))
+        tmp.append(getType(name,2))
     print("api.getType_multi:"+str(tmp))
     return tmp
 
@@ -43,6 +44,8 @@ def getResponse(name, content,mode):
         jsoncon = json.loads(content)
         response = ''
         if content.find('250')!=-1:
+            if mode==2:
+                return '很抱歉，您当前搜索的[%s]暂无分类结果，请您提交错误'%(name)
             return '很抱歉，您当前搜索的[%s]暂无分类结果，请您通过“垃圾图鉴”查询'%(name)
         if jsoncon['msg'] != 'success':
             return '[%s]err:分类检索失败-not success' % (name)

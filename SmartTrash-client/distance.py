@@ -46,7 +46,7 @@ def start():
         print("Measured Distance = {:.2f} cm".format(dist))#debug
         if dist<distmin:
             print('distance.start:dist<distmin')
-            if usemulti:
+            if main.usemulti:
                 ui.run_multi()
             else:
                 ui.run()
