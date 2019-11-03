@@ -13,6 +13,8 @@ window = None
 l = None
 b1 = None
 
+sleeptime=10
+
 def ontake(path):
     if window == None:
         init()
@@ -25,7 +27,7 @@ def updateui():
     w2.geometry('1280x720')
     l = tk.Label(w2,text='您觉得[%s]应该是什么垃圾'%(name), bg='white', fg='black', font=('Arial', 24), width=40, height=4).pack()
     for i in range(4):
-        tk.Button(w2, text=typelist[i]+'垃圾', font=('Arial', 24), width=20, height=2, command=lambda:updatetype(name,i)).pack()
+        tk.Button(w2, text=typelist[i]+'垃圾', font=('Arial', 24), width=20, height=2, command=lambda arg2=i,arg1=name:updatetype(arg1,arg2)).pack()
     w2.mainloop()
 
 def historyui():
@@ -40,6 +42,7 @@ def historyui():
 def updatetype(name,ttype):
     global trashtype
     image.updatetype(name,ttype)
+    print('ui.updatetype:name=%s type=%s'%(name,ttype))
     if main.usemulti:
         image.addHistory(name,trashtype)
         historyui()
@@ -50,7 +53,9 @@ def updatetype(name,ttype):
 
 def selectname(num):
     global selectnum
+    global resttime
     selectnum=num
+    resttime=0
     print("ui.selectname.num="+str(num))
 
 def run():
@@ -80,6 +85,8 @@ def run_multi():
     global trashtype
     global window
     global selectbtn
+    global selectnum
+    global resttime
     l.config(text='拍摄照片中')
     image.take()
     l.config(text='识别物品中')
@@ -94,18 +101,21 @@ def run_multi():
     for i in range(4):
         if i==0 or ic['result'][i]['score']>=0.5:
             finalname.append(namelist[i])
-            selectbtn[i].config(state='normal',text='这是[%s]\n获取分类中' % (namelist[i]))
+            selectbtn[i].config(state='disabled',text='这是[%s]\n获取分类中' % (namelist[i]))
         else:
             selectbtn[i].config(state='disabled',text='')
     typelist=json.loads(image.getType_multi(finalname))
     for i in range(len(typelist)):
         if typelist[i].find('无分类')==-1:
-            selectbtn[i].config(text='这是[%s]\n属于[%s]' % (finalname[i], typelist[i]))
+            selectbtn[i].config(state='normal',text='这是[%s]\n属于[%s]' % (finalname[i], typelist[i]))
         else:
-            selectbtn[i].config(text='这是[%s]\n%s' % (finalname[i], '暂无分类结果'))
+            selectbtn[i].config(state='normal',text='这是[%s]\n%s' % (finalname[i], '暂无分类结果'))
     selectnum=0
-    l.config(text='请选出相对正确的结果\n10秒后默认选择第一个结果')
-    time.sleep(10)
+    resttime=sleeptime
+    l.config(text='请选出相对正确的结果\n%s秒后默认选择第一个结果'%(str(sleeptime)))
+    while resttime>0:
+        time.sleep(0.1)
+        resttime=resttime-0.1
     #wrong.config(state='normal')
     name=finalname[selectnum]
     trashtype=typelist[selectnum]
@@ -140,7 +150,7 @@ def start():
         fm=tk.Frame(window)
         selectbtn=[]
         for i in range(4):
-            selectbtn.append(tk.Button(fm, text='', font=('Arial', 24), width=15, height=2, command=lambda:selectname(i),state='disabled'))
+            selectbtn.append(tk.Button(fm, text='', font=('Arial', 24), width=15, height=2, command=lambda arg=i:selectname(arg),state='disabled'))
             selectbtn[i].pack(side='left')
         fm.pack()
     else:
