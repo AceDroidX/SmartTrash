@@ -87,6 +87,7 @@ def run_multi():
     global selectbtn
     global selectnum
     global resttime
+    wrong.config(state='disabled')
     l.config(text='拍摄照片中')
     image.take()
     l.config(text='识别物品中')
@@ -94,17 +95,22 @@ def run_multi():
     if str(ic).find('err')!=-1:
         l.config(text='物品识别错误')
         print(str(ic))
+        return
+    ic=json.loads(json.dumps(ic).replace('/',','))
     namelist=[]
     for i in range(ic['result_num']):
         namelist.append(ic['result'][i]['keyword'])
+    print('ui.run_multi.namelist:'+str(namelist))
     finalname=[]
     for i in range(4):
-        if i==0 or ic['result'][i]['score']>=0.5:
+        if i==0 or ic['result'][i]['score']>=0.05:
             finalname.append(namelist[i])
             selectbtn[i].config(state='disabled',text='这是[%s]\n获取分类中' % (namelist[i]))
         else:
             selectbtn[i].config(state='disabled',text='')
+    print('ui.run_multi.finalname:'+str(finalname))
     typelist=json.loads(image.getType_multi(finalname))
+    print('ui.run_multi.typelist:'+str(typelist))
     for i in range(len(typelist)):
         if typelist[i].find('无分类')==-1:
             selectbtn[i].config(state='normal',text='这是[%s]\n属于[%s]' % (finalname[i], typelist[i]))
@@ -117,6 +123,8 @@ def run_multi():
         time.sleep(0.1)
         resttime=resttime-0.1
     #wrong.config(state='normal')
+    for i in range(4):
+        selectbtn[i].config(text='',state='disabled')
     name=finalname[selectnum]
     trashtype=typelist[selectnum]
     if trashtype.find('无分类')==-1:
@@ -128,8 +136,6 @@ def run_multi():
     else:
         l.config(text='这是[%s]\n%s' % (name, trashtype))
         wrong.config(state='normal')
-    for i in range(4):
-        selectbtn[i].config(text='',state='disabled')
     #hardware.run(trashtype)
 
 def start():
@@ -162,8 +168,12 @@ def start():
     wrong = tk.Button(window, text='觉得分类有问题？点击提交错误', font=('Arial', 24), width=25, height=2, command=updateui,state='disabled')
     wrong.pack()
     if main.uihistory:
-        history = tk.Listbox(window, font=('Arial', 24),width=60,height=10)
+        fmh=tk.Frame(window)
+        history = tk.Listbox(window,font=('Arial', 24),width=60,height=10)
         history.pack()
+        #sb = tk.Scrollbar(fmh,command=history.yview)
+        #sb.pack(side='right',fill='y')
+        #history.config(yscrollcommand=sb.set)
         history.insert("end", '垃圾投入历史记录')
         historyui()
     window.mainloop()

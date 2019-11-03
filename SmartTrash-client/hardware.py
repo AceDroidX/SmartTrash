@@ -84,8 +84,8 @@ def run(trashtype):
 if __name__ == '__main__':
     init()
     while True:
-        run(input('in1>'))
-        # num=int(input('in1>'))
-        # change(IN1,num)
-        # num=int(input('in2>'))
-        # change(IN2,num)
+        #run(input('in1>'))
+        num=int(input('in1>'))
+        change(IN1,num)
+        num=int(input('in2>'))
+        change(IN2,num)

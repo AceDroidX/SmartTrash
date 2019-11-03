@@ -30,7 +30,6 @@ def token():
     content = urllib.request.urlopen(request).read().decode("utf-8")
     tokenjson = json.loads(content)
     access_token = tokenjson['access_token']
-    print(access_token)  # debug
     return access_token
 
 
@@ -53,7 +52,7 @@ def image_classify(img):
     content = urllib.request.urlopen(request).read().decode("utf-8")
     result = json.loads(content)
     print(content)  # debug
-    print(result['result'][0]['keyword'])
+    print('image.image_classify.[0]:'+result['result'][0]['keyword'])
     return result
 
 
@@ -98,7 +97,7 @@ def getType(name):
     }
     request = urllib.request.Request(host, headers=headers)
     content = urllib.request.urlopen(request).read().decode("utf-8")
-    print(content)  # debug
+    print('image.getType:'+content)  # debug
     return content
 
 def getType_multi(name):    
@@ -108,7 +107,7 @@ def getType_multi(name):
     }
     request = urllib.request.Request(host, headers=headers)
     content = urllib.request.urlopen(request).read().decode("utf-8")
-    print(content)  # debug
+    print('image.getType_multi:'+content)  # debug
     return content
 
 def updatetype(name,trashtype):
