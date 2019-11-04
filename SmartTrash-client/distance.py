@@ -6,6 +6,7 @@ import threading
  
 distmin=25
 whiletime=1
+distmax=1
  
 #设置 GPIO 模式为 BCM
 GPIO.setmode(GPIO.BCM)
@@ -43,8 +44,8 @@ def start():
     while True:
         global dist
         dist = distance()
-        #print("Measured Distance = {:.2f} cm".format(dist))#debug
-        if dist<distmin:
+        print("Measured Distance = {:.2f} cm".format(dist))#debug
+        if dist<distmin and dist>distmax:
             print('distance.start:dist<distmin')
             if main.usemulti:
                 ui.run_multi()
@@ -57,10 +58,12 @@ def startThread():
     serverThread.start()
     
 if __name__ == '__main__':
+    '''
     ui.startui()
     time.sleep(0.5)
     start()
-'''
+    '''
+
     try:
         while True:
             dist = distance()
@@ -70,4 +73,4 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print("Measurement stopped by User")
         GPIO.cleanup()
-'''
+

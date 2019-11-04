@@ -2,11 +2,12 @@ import pigpio
 import time
 import os
 # 40-90 90-140
-IN1 = 18
-IN2 = 23
+IN1 = 23
+IN2 = 18
 changetime = 1
 pi = None
-turnangle=60
+turnangle=90
+turnang2=60
 
 def angle2duty(degree):
     if degree > 180 or degree < 0:
@@ -62,19 +63,19 @@ def run(trashtype):
     if trashtype == '可回收' or trashtype == '0':
         change(IN1, 90-turnangle)
         time.sleep(changetime)
-        change(IN2, 90-turnangle)
+        change(IN2, 90-turnang2)
     elif trashtype == '有害' or trashtype == '1':
         change(IN1, 90-turnangle)
         time.sleep(changetime)
-        change(IN2, 90+turnangle)
+        change(IN2, 90+turnang2)
     elif trashtype == '厨余(湿)' or trashtype == '2':
         change(IN1, 90+turnangle)
         time.sleep(changetime)
-        change(IN2, 90-turnangle)
+        change(IN2, 90-turnang2)
     elif trashtype == '其他(干)' or trashtype == '3':
         change(IN1, 90+turnangle)
         time.sleep(changetime)
-        change(IN2, 90+turnangle)
+        change(IN2, 90+turnang2)
     else:
         print('err:hardware run trashtype')
     time.sleep(changetime)
@@ -87,5 +88,5 @@ if __name__ == '__main__':
         #run(input('in1>'))
         num=int(input('in1>'))
         change(IN1,num)
-        num=int(input('in2>'))
-        change(IN2,num)
+        #num=int(input('in2>'))
+        #change(IN2,num)
