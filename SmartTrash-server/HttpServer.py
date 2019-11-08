@@ -162,7 +162,7 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 tmp=params[2].split(' ')
                 print("httpserver.app-gettype-multi.tmp:"+str(tmp))
                 result = api.getType_multi(tmp,3)
-                self.send(json.dumps(result,ensure_ascii=False))
+                self.send('###'.join(result))
             else:
                 self.send('无效指令'.encode('utf-8'))
         except IndexError:
