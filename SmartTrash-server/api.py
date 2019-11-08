@@ -14,7 +14,7 @@ def getType(name,mode=0):
         dbresult=database.getType(name)
         if dbresult!=None:
             result=dbresult[0]
-            if mode!=2:
+            if mode!=2 or mode!=3:
                 database.addHistory(name,result)
             print('api.getType.result:'+typelist[result])
             return typelist[result]
@@ -32,10 +32,10 @@ def getType(name,mode=0):
     print('api.getType.result:'+result)
     return result
 
-def getType_multi(namelist):
+def getType_multi(namelist,mode=2):
     tmp=[]
     for name in namelist:
-        tmp.append(getType(name,2))
+        tmp.append(getType(name,mode))
     print("api.getType_multi:"+str(tmp))
     return tmp
 
@@ -53,7 +53,7 @@ def getResponse(name, content,mode):
         #typelist = ['可回收', '有害', '厨余(湿)', '其他(干)']
         if mode==0:
             return jsoncon['newslist'][0]['type']
-        elif mode==1:
+        elif mode==1 or mode==3:
             trashtype=typelist[jsoncon['newslist'][0]['type']]
             explain=jsoncon['newslist'][0]['explain']
             contain=jsoncon['newslist'][0]['contain']
