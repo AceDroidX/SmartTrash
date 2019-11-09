@@ -1,6 +1,7 @@
 import mysql.connector
 import APIKey
 typelist = ['可回收', '有害', '厨余(湿)', '其他(干)']
+typelist2 = {'可回收':0, '有害':1, '厨余(湿)':2, '其他(干)':3}
 
 def connect():
     global mydb
@@ -70,6 +71,9 @@ def addHistory(name, trashtype):
     global mydb
     global mycursor
     connect()
+    if type(trashtype) == str:
+        if not trashtype.isdecimal():
+            trashtype=typelist2[trashtype]
     if type(trashtype) == int:
         trashtype = str(trashtype)
     print('database.addHistory:[name:%strashtype:%s]' % (name, trashtype))
