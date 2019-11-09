@@ -1,5 +1,6 @@
 import mysql.connector
 import APIKey
+typelist = ['可回收', '有害', '厨余(湿)', '其他(干)']
 
 def connect():
     global mydb
@@ -81,14 +82,24 @@ def addHistory(name, trashtype):
     return mycursor.rowcount
 
 
-def getHistory():
+def getHistory(mode=0):
     global mydb
     global mycursor
     connect()
     mycursor = mydb.cursor()
     mycursor.execute('use smarttrash')
-    mycursor.execute('SELECT * FROM history ORDER BY time DESC LIMIT 100')
+    if mode==3:
+        mycursor.execute('SELECT * FROM history ORDER BY time DESC LIMIT 10')
+    else:
+        mycursor.execute('SELECT * FROM history ORDER BY time DESC LIMIT 100')
     result = mycursor.fetchall()     # fetchall() 获取所有记录
     #print('getType:'+str(result))
     close()
+    if mode==3:
+        tmp=[]
+        tmp.append('垃圾识别历史记录:')
+        for item in result:
+            oneresult='垃圾名:%s  类型:%s  识别时间:%s'%(item[1],typelist[int(item[2])],item[3])
+            tmp.append(oneresult)
+        result=tmp
     return result

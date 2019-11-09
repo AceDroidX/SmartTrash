@@ -163,6 +163,16 @@ class Server(http.server.SimpleHTTPRequestHandler):
                 print("httpserver.app-gettype-multi.tmp:"+str(tmp))
                 result = api.getType_multi(tmp,3)
                 self.send('###'.join(result))
+            elif params[1]=='app-db-history':
+                if main.usedb==False:
+                    self.send('err:服务器关闭了数据添加功能')
+                    return
+                try:
+                    result=database.getHistory(3)
+                    self.send('\n'.join(result))
+                except:
+                    self.send('err:服务器数据库读取失败')
+                    raise
             else:
                 self.send('无效指令'.encode('utf-8'))
         except IndexError:

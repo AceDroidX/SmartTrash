@@ -8,6 +8,11 @@ thkey = APIKey.th_key
 typelist = ['可回收', '有害', '厨余(湿)', '其他(干)']
 type_url='https://api.tianapi.com/txapi/lajifenlei?num=5&key=%s&word=' % (thkey)
 
+#mode0--普通获取单个类别
+#mode1--包括getmore内容
+#mode2--普通获取多个类别
+#mode3--获取多个类别+getmore内容
+
 def getType(name,mode=0):
     name=urllib.parse.unquote(name)
     if main.usedb:
